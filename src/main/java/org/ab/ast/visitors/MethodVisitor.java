@@ -6,8 +6,8 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 public class MethodVisitor extends ASTVisitor {
 	private MethodObject methodObject;
 	
-	public MethodVisitor(String methodName) {
-		this.methodObject = new MethodObject(methodName);
+	public MethodVisitor(String name, String body, boolean constructor) {
+		this.methodObject = new MethodObject(name, body, constructor);
 	}
 	
 	public MethodObject getMethodObject() {

@@ -16,12 +16,25 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 public class SystemObject {
+	private static SystemObject INSTANCE = null;
+	
 	private Set<FileObject> files;
 	private String repoPath;
 	private String[] sourcepathEntries;
 	
-	public SystemObject(String repoPath, String[] dirs) {
+	private SystemObject() {
 		this.files = new HashSet<FileObject>();
+	}
+	
+	public static SystemObject getInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new SystemObject();
+		}
+		
+		return INSTANCE;
+	}
+	
+	public void initialize(String repoPath, String[] dirs) {
 		this.repoPath = repoPath;
 		
 		this.sourcepathEntries = getSourcepathEntries();
@@ -69,6 +82,15 @@ public class SystemObject {
 	
 	public Set<FileObject> getFiles() {
 		return this.files;
+	}
+	
+	public Set<ClassObject> getClasses() {
+		Set<ClassObject> classes = new HashSet<ClassObject>();
+		for (FileObject f: files) {
+			classes.addAll(f.getClasses());
+		}
+		
+		return classes;
 	}
 	
 	private String[] getSourcepathEntries() {

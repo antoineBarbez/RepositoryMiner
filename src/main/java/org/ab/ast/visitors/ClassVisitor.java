@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.ab.ast.AttributeObject;
 import org.ab.ast.ClassObject;
+import org.ab.ast.MethodObject;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -36,6 +37,10 @@ public class ClassVisitor extends ASTVisitor {
 	
 	@Override
 	public boolean visit(MethodDeclaration node) {
+		if (node.getBody() == null) {
+			return true;
+		}
+		
 		// Construct the method's name.
 		List<String> params = new ArrayList<String>();
 		for (SingleVariableDeclaration var : (List<SingleVariableDeclaration>) node.parameters()) {
@@ -53,15 +58,15 @@ public class ClassVisitor extends ASTVisitor {
 		buffer.append("(");
 		buffer.append(String.join(", ", params));
 		buffer.append(")");
-
 		String methodName = buffer.toString();
 				
-		
 		// Visit the body of the method.
-		MethodVisitor visitor = new MethodVisitor(methodName);
-		if (node.getBody() != null) {
-			node.getBody().accept(visitor);
-		}
+		MethodVisitor visitor = new MethodVisitor(
+				methodName,
+				node.getBody().toString(),
+				node.isConstructor());
+		
+		node.getBody().accept(visitor);
 		
 		classObject.addMethod(visitor.getMethodObject());
 		
