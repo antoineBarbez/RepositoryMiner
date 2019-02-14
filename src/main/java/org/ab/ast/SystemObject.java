@@ -3,7 +3,9 @@ package org.ab.ast;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,13 +20,13 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class SystemObject {
 	private static SystemObject INSTANCE = null;
 	
-	private Set<FileObject> files;
 	private String repoPath;
 	private String[] sourcepathEntries;
 	
-	private SystemObject() {
-		this.files = new HashSet<FileObject>();
-	}
+	private Set<FileObject> files = new HashSet<FileObject>();
+	private Map<String, AttributeObject> attributeMap = new HashMap<String, AttributeObject>();
+	private Map<String, MethodObject> methodMap = new HashMap<String, MethodObject>();
+	private Map<String, ClassObject> classMap= new HashMap<String, ClassObject>();
 	
 	public static SystemObject getInstance() {
 		if (INSTANCE == null) {
@@ -78,6 +80,9 @@ public class SystemObject {
 		cu.accept(visitor);
 		
 		files.add(visitor.getFileObject());
+		attributeMap.putAll(visitor.getAttributeMap());
+		methodMap.putAll(visitor.getMethodMap());
+		classMap.putAll(visitor.getClassMap());
 	}
 	
 	public Set<FileObject> getFiles() {
@@ -91,6 +96,27 @@ public class SystemObject {
 		}
 		
 		return classes;
+	}
+	
+	public AttributeObject getAttributeByName(String fullName) {
+		if (attributeMap.containsKey(fullName)) {
+			return attributeMap.get(fullName);
+		}
+		return null;
+	}
+	
+	public MethodObject getMethodByName(String fullName) {
+		if (methodMap.containsKey(fullName)) {
+			return methodMap.get(fullName);
+		}
+		return null;
+	}
+	
+	public ClassObject getClassByName(String name) {
+		if (classMap.containsKey(name)) {
+			return classMap.get(name);
+		}
+		return null;
 	}
 	
 	private String[] getSourcepathEntries() {

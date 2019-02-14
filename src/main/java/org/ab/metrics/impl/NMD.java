@@ -6,8 +6,7 @@ import org.ab.metrics.IUnaryClassMetric;
 public class NMD implements IUnaryClassMetric {
 
 	public double compute(ClassObject c) {
-		// TODO
-		return 0;
+		return c.getMethods().size();
 	}
 	
 	public String getName() {

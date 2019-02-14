@@ -37,20 +37,12 @@ public class ClassVisitor extends ASTVisitor {
 	
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		if (node.getBody() == null) {
-			return true;
-		}
-		
 		// Construct the method's name.
 		List<String> params = new ArrayList<String>();
 		for (SingleVariableDeclaration var : (List<SingleVariableDeclaration>) node.parameters()) {
-			IVariableBinding varBind = var.resolveBinding();
-			if (varBind == null) {
-				params.add(var.toString().split("\\s+")[0]);
-			}else {
-				params.add(varBind.getType().getQualifiedName());
-			}
+			params.add(var.getType().toString());
 		}
+		
 		Collections.sort(params, String.CASE_INSENSITIVE_ORDER);
 		
 		StringBuffer buffer = new StringBuffer();
@@ -61,12 +53,11 @@ public class ClassVisitor extends ASTVisitor {
 		String methodName = buffer.toString();
 				
 		// Visit the body of the method.
-		MethodVisitor visitor = new MethodVisitor(
-				methodName,
-				node.getBody().toString(),
-				node.isConstructor());
+		MethodVisitor visitor = new MethodVisitor(methodName, node);
 		
-		node.getBody().accept(visitor);
+		if (node.getBody() != null) {
+			node.getBody().accept(visitor);
+		}
 		
 		classObject.addMethod(visitor.getMethodObject());
 		

@@ -33,4 +33,21 @@ public class ClassObject {
 	public Set<MethodObject> getMethods() {
 		return this.methods;
 	}
+	
+	public boolean isDataClass() {
+		int nbAttributes = attributes.size();
+		int nbNonAccessorMethods = 0;
+		for (MethodObject m: methods) {
+			if (!m.isAccessor()) {
+				nbNonAccessorMethods++;
+			}
+		}
+		nbNonAccessorMethods = Integer.max(1, nbNonAccessorMethods);
+		
+		double ratio = nbAttributes/nbNonAccessorMethods;
+		if (ratio >= 5) {
+			return true;
+		}
+		return false;
+	}
 }

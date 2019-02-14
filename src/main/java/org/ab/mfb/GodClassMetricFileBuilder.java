@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.ab.ast.ClassObject;
+import org.ab.ast.FileObject;
 import org.ab.ast.SystemObject;
 import org.ab.metrics.IUnaryClassMetric;
 import org.ab.metrics.impl.LCOM5;
@@ -51,14 +52,17 @@ public class GodClassMetricFileBuilder implements IMetricFileBuilder {
 		SystemObject s = SystemObject.getInstance();
 		
 		List<String> lines = new ArrayList<String>();
-		for (ClassObject c : s.getClasses()) {
-			StringBuffer lineBuffer = new StringBuffer();
-			lineBuffer.append(c.getName());
-			for (IUnaryClassMetric metric: metrics) {
-				lineBuffer.append(";");
-				lineBuffer.append(String.valueOf(metric.compute(c)));
+		for (FileObject f: s.getFiles()) {
+			String packageName = f.getPackageName();
+			for (ClassObject c : f.getClasses()) {
+				StringBuffer lineBuffer = new StringBuffer();
+				lineBuffer.append(packageName + "." + c.getName());
+				for (IUnaryClassMetric metric: metrics) {
+					lineBuffer.append(";");
+					lineBuffer.append(String.valueOf(metric.compute(c)));
+				}
+				lines.add(lineBuffer.toString());
 			}
-			lines.add(lineBuffer.toString());
 		}
 		
 		return lines;
