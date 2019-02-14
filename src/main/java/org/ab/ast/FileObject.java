@@ -6,11 +6,10 @@ import java.util.Set;
 public class FileObject {
 	private String path;
 	private String packageName;
-	private Set<ClassObject> classes;
+	private Set<ClassObject> classes  = new HashSet<ClassObject>();
 	
 	public FileObject(String path) {
 		this.path = path;
-		this.classes = new HashSet<ClassObject>();
 	}
 	
 	public void addClass(ClassObject c) {

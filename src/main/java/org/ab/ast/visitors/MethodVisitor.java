@@ -36,7 +36,13 @@ public class MethodVisitor extends ASTVisitor {
 	public boolean visit(FieldAccess node) {
 		IVariableBinding fBind = node.resolveFieldBinding();
 		if (fBind != null) {
-			String declaringClass = fBind.getDeclaringClass().getQualifiedName();
+			String declaringClass;
+			if (fBind.getDeclaringClass().isParameterizedType()) {
+				declaringClass = fBind.getDeclaringClass().getTypeDeclaration().getQualifiedName();
+			}else {
+				declaringClass = fBind.getDeclaringClass().getQualifiedName();
+			}
+			
 			String attributeName = fBind.getName();
 			methodObject.accessedAttributes.add(declaringClass + "." + attributeName);
 		}
@@ -48,7 +54,12 @@ public class MethodVisitor extends ASTVisitor {
 	public boolean visit(MethodInvocation node) {
 		IMethodBinding mBind = node.resolveMethodBinding();
 		if (mBind != null) {
-			String declaringClass = mBind.getDeclaringClass().getQualifiedName();
+			String declaringClass;
+			if (mBind.getDeclaringClass().isParameterizedType()) {
+				declaringClass = mBind.getDeclaringClass().getTypeDeclaration().getQualifiedName();
+			}else {
+				declaringClass = mBind.getDeclaringClass().getQualifiedName();
+			}
 			
 			List<String> params = new ArrayList<>();
 			for (ITypeBinding paramType : mBind.getParameterTypes()) {

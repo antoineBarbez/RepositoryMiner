@@ -5,33 +5,40 @@ import java.util.Set;
 
 public class ClassObject {
 	private String name;
-	private Set<AttributeObject> attributes;
-	private Set<MethodObject> methods;
+	private Set<AttributeObject> attributes = new HashSet<AttributeObject>();
+	private Set<MethodObject> methods = new HashSet<MethodObject>();
+	private Set<InnerClassObject> innerClasses = new HashSet<InnerClassObject>();
 	
 	public ClassObject(String name) {
 		this.name = name;
-		this.attributes = new HashSet<AttributeObject>();
-		this.methods = new HashSet<MethodObject>();
 	}
 	
 	public void addAttribute(AttributeObject a) {
-		this.attributes.add(a);
+		attributes.add(a);
 	}
 	
 	public void addMethod(MethodObject m) {
-		this.methods.add(m);
+		methods.add(m);
+	}
+	
+	public void addInnerClass(InnerClassObject c) {
+		innerClasses.add(c);
+	}
+	
+	public Set<AttributeObject> getAttributes() {
+		return attributes;
+	}
+	
+	public Set<MethodObject> getMethods() {
+		return methods;
+	}
+	
+	public Set<InnerClassObject> getInnerClasses() {
+		return innerClasses;
 	}
 	
 	public String getName() {
 		return this.name;
-	}
-	
-	public Set<AttributeObject> getAttributes() {
-		return this.attributes;
-	}
-	
-	public Set<MethodObject> getMethods() {
-		return this.methods;
 	}
 	
 	public boolean isDataClass() {

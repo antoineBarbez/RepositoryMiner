@@ -79,23 +79,28 @@ public class SystemObject {
 		FileVisitor visitor = new FileVisitor(fileName);
 		cu.accept(visitor);
 		
-		files.add(visitor.getFileObject());
-		attributeMap.putAll(visitor.getAttributeMap());
-		methodMap.putAll(visitor.getMethodMap());
-		classMap.putAll(visitor.getClassMap());
+		FileObject f = visitor.getFileObject();
+		files.add(f);
+		for (ClassObject c: f.getClasses()) {
+			fillMapsRecursively(c);
+		}
+	}
+	
+	private void fillMapsRecursively(ClassObject c) {
+		classMap.put(c.getName(), c);
+		for (AttributeObject a: c.getAttributes()) {
+			attributeMap.put(a.getName(), a);
+		}
+		for (MethodObject m: c.getMethods()) {
+			methodMap.put(m.getName(), m);
+		}
+		for (InnerClassObject ic: c.getInnerClasses()) {
+			fillMapsRecursively(ic);
+		}
 	}
 	
 	public Set<FileObject> getFiles() {
 		return this.files;
-	}
-	
-	public Set<ClassObject> getClasses() {
-		Set<ClassObject> classes = new HashSet<ClassObject>();
-		for (FileObject f: files) {
-			classes.addAll(f.getClasses());
-		}
-		
-		return classes;
 	}
 	
 	public AttributeObject getAttributeByName(String fullName) {

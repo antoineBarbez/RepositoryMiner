@@ -56,7 +56,7 @@ public class GodClassMetricFileBuilder implements IMetricFileBuilder {
 			String packageName = f.getPackageName();
 			for (ClassObject c : f.getClasses()) {
 				StringBuffer lineBuffer = new StringBuffer();
-				lineBuffer.append(packageName + "." + c.getName());
+				lineBuffer.append(c.getName());
 				for (IUnaryClassMetric metric: metrics) {
 					lineBuffer.append(";");
 					lineBuffer.append(String.valueOf(metric.compute(c)));
