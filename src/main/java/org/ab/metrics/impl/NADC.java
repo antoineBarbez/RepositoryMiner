@@ -3,7 +3,7 @@ package org.ab.metrics.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.ab.ast.AttributeObject;
+import org.ab.ast.FieldObject;
 import org.ab.ast.ClassObject;
 import org.ab.ast.MethodObject;
 import org.ab.ast.SystemObject;
@@ -16,17 +16,17 @@ public class NADC implements IUnaryClassMetric {
 		
 		Set<ClassObject> accessedDataClasses = new HashSet<ClassObject>();
 		for (MethodObject m: c.getMethods()) {
-			for (String aa: m.accessedAttributes) {
-				AttributeObject aao = s.getAttributeByName(aa);
-				if (aao != null) {
-					ClassObject ac = aao.getDeclaringClass();
+			for (String af: m.getAccessedFields()) {
+				FieldObject afo = s.getFieldByName(af);
+				if (afo != null) {
+					ClassObject ac = afo.getDeclaringClass();
 					if (ac.isDataClass()) {
 						accessedDataClasses.add(ac);
 					}
 				}
 			}
 			
-			for (String im: m.invokedMethods) {
+			for (String im: m.getInvokedMethods()) {
 				MethodObject imo = s.getMethodByName(im);
 				if (imo != null) {
 					ClassObject ac = imo.getDeclaringClass();

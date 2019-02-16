@@ -6,7 +6,7 @@ import org.ab.metrics.IUnaryClassMetric;
 public class NAD implements IUnaryClassMetric {
 
 	public double compute(ClassObject c) {
-		return c.getAttributes().size();
+		return c.getFields().size();
 	}
 
 	public String getName() {

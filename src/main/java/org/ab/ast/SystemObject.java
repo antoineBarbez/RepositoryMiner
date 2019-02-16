@@ -24,7 +24,7 @@ public class SystemObject {
 	private String[] sourcepathEntries;
 	
 	private Set<FileObject> files = new HashSet<FileObject>();
-	private Map<String, AttributeObject> attributeMap = new HashMap<String, AttributeObject>();
+	private Map<String, FieldObject> fieldMap = new HashMap<String, FieldObject>();
 	private Map<String, MethodObject> methodMap = new HashMap<String, MethodObject>();
 	private Map<String, ClassObject> classMap= new HashMap<String, ClassObject>();
 	
@@ -88,8 +88,8 @@ public class SystemObject {
 	
 	private void fillMapsRecursively(ClassObject c) {
 		classMap.put(c.getName(), c);
-		for (AttributeObject a: c.getAttributes()) {
-			attributeMap.put(a.getName(), a);
+		for (FieldObject f: c.getFields()) {
+			fieldMap.put(f.getName(), f);
 		}
 		for (MethodObject m: c.getMethods()) {
 			methodMap.put(m.getName(), m);
@@ -103,9 +103,9 @@ public class SystemObject {
 		return this.files;
 	}
 	
-	public AttributeObject getAttributeByName(String fullName) {
-		if (attributeMap.containsKey(fullName)) {
-			return attributeMap.get(fullName);
+	public FieldObject getFieldByName(String name) {
+		if (fieldMap.containsKey(name)) {
+			return fieldMap.get(name);
 		}
 		return null;
 	}

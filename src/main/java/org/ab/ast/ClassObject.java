@@ -3,46 +3,42 @@ package org.ab.ast;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ClassObject {
-	private String name;
-	private Set<AttributeObject> attributes = new HashSet<AttributeObject>();
-	private Set<MethodObject> methods = new HashSet<MethodObject>();
+public class ClassObject extends CodeComponent {
+	private boolean _Interface = false;
+	private Set<FieldObject> fields = new HashSet<FieldObject>();
 	private Set<InnerClassObject> innerClasses = new HashSet<InnerClassObject>();
+	private Set<MethodObject> methods = new HashSet<MethodObject>();
 	
 	public ClassObject(String name) {
-		this.name = name;
+		super(name);
 	}
 	
-	public void addAttribute(AttributeObject a) {
-		attributes.add(a);
+	public void addField(FieldObject field) {
+		fields.add(field);
+	}
+	
+	public void addInnerClass(InnerClassObject innerClass) {
+		innerClasses.add(innerClass);
 	}
 	
 	public void addMethod(MethodObject m) {
 		methods.add(m);
 	}
 	
-	public void addInnerClass(InnerClassObject c) {
-		innerClasses.add(c);
-	}
-	
-	public Set<AttributeObject> getAttributes() {
-		return attributes;
-	}
-	
-	public Set<MethodObject> getMethods() {
-		return methods;
+	public Set<FieldObject> getFields() {
+		return fields;
 	}
 	
 	public Set<InnerClassObject> getInnerClasses() {
 		return innerClasses;
 	}
 	
-	public String getName() {
-		return this.name;
+	public Set<MethodObject> getMethods() {
+		return methods;
 	}
 	
 	public boolean isDataClass() {
-		int nbAttributes = attributes.size();
+		int nbFields = fields.size();
 		int nbNonAccessorMethods = 0;
 		for (MethodObject m: methods) {
 			if (!m.isAccessor()) {
@@ -51,10 +47,18 @@ public class ClassObject {
 		}
 		nbNonAccessorMethods = Integer.max(1, nbNonAccessorMethods);
 		
-		double ratio = nbAttributes/nbNonAccessorMethods;
-		if (ratio >= 5) {
+		double ratio = nbFields/nbNonAccessorMethods;
+		if (ratio >= 7) {
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean isInterface() {
+		return _Interface;
+	}
+	
+	public void setInterface(boolean _interface) {
+		this._Interface = _interface;
 	}
 }

@@ -14,19 +14,18 @@ public class FileObject {
 	
 	public void addClass(ClassObject c) {
 		this.classes.add(c);
-		
 	}
 	
 	public Set<ClassObject> getClasses() {
 		return this.classes;
 	}
 	
-	public String getPath() {
-		return this.path;
+	public String getPackageName() {
+		return packageName;
 	}
 	
-	public String getPackageName() {
-		return this.packageName;
+	public String getPath() {
+		return path;
 	}
 	
 	public void setPackageName(String packageName) {

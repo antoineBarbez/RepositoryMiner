@@ -3,39 +3,39 @@ package org.ab.ast;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MethodObject {
-	private ClassObject declaringClass;
-	private String name;
-	private String body;
-	private boolean constructor;
+public class MethodObject extends CodeComponent {
+	private String body = "";
+	private boolean constructor = false;
+	private ClassObject declaringClass = null;
+	private Set<String> accessedFields = new HashSet<String>();
+	private Set<String> invokedMethods = new HashSet<String>();
 	
-	public Set<String> accessedAttributes = new HashSet<String>();
-	public Set<String> invokedMethods = new HashSet<String>();
-	
-	public MethodObject(String name, String body, boolean constructor) {
-		this.name = name;
-		this.body = body;
-		this.constructor = constructor;
+	public MethodObject(String name) {
+		super(name);
 	}
 	
-	public String getName() {
-		return this.name;
+	public void addAccessedField(String field) {
+		accessedFields.add(field);
 	}
 	
-	public ClassObject getDeclaringClass() {
-		return this.declaringClass;
+	public void addInvokedMethod(String method) {
+		invokedMethods.add(method);
 	}
 	
-	public void setDeclaringClass(ClassObject declaringClass) {
-		this.declaringClass = declaringClass;
+	public Set<String> getAccessedFields () {
+		return accessedFields;
 	}
 	
 	public String getBody() {
-		return this.body;
+		return body;
 	}
 	
-	public boolean isConstructor() {
-		return this.constructor;
+	public ClassObject getDeclaringClass() {
+		return declaringClass;
+	}
+	
+	public Set<String> getInvokedMethods() {
+		return invokedMethods;
 	}
 	
 	public boolean isAccessor() {
@@ -43,10 +43,26 @@ public class MethodObject {
 			return false;
 		}
 		
-		if (name.startsWith("get") || name.startsWith("set") || name.startsWith("is")) {
+		if (getName().startsWith("get") || getName().startsWith("set") || getName().startsWith("is")) {
 			return true;
 		}
 		
 		return false;
+	}
+	
+	public boolean isConstructor() {
+		return constructor;
+	}
+	
+	public void setBody(String body) {
+		this.body = body;
+	}
+	
+	public void setConstructor(boolean constructor) {
+		this.constructor = constructor;
+	}
+	
+	public void setDeclaringClass(ClassObject declaringClass) {
+		this.declaringClass = declaringClass;
 	}
 }

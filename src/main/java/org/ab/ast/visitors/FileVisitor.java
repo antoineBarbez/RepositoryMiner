@@ -1,6 +1,6 @@
 package org.ab.ast.visitors;
 
-import org.ab.ast.AttributeObject;
+import org.ab.ast.FieldObject;
 import org.ab.ast.ClassObject;
 import org.ab.ast.FileObject;
 import org.ab.ast.InnerClassObject;
@@ -42,8 +42,14 @@ public class FileVisitor extends ASTVisitor {
 		
 		ClassObject c = visitor.getClassObject();
 		
-		for (AttributeObject a: c.getAttributes()) {
-			a.setDeclaringClass(c);
+		c.setInterface(node.isInterface());
+		
+		for (Object modifier: node.modifiers()) {
+			c.addModifier(modifier.toString());
+		}
+		
+		for (FieldObject f: c.getFields()) {
+			f.setDeclaringClass(c);
 		}
 		
 		for (MethodObject m: c.getMethods()) {
