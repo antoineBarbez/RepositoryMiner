@@ -3,6 +3,7 @@ package org.ab;
 import java.io.FileNotFoundException;
 
 import org.ab.ast.SystemObject;
+import org.ab.ast.visitors.SystemBuilder;
 import org.ab.mfb.GodClassMetricFileBuilder;
 
 public class RepositoryMiner {
@@ -15,8 +16,8 @@ public class RepositoryMiner {
 	}
 	
 	private static void mine(String repoFolder, String sha) throws FileNotFoundException {
-		SystemObject system = SystemObject.getInstance();
-		system.initialize(repoFolder, new String[]{"v4"});
+		SystemBuilder builder = new SystemBuilder(repoFolder);
+		builder.builtSystem(new String[]{"v4"});
 		
 		GodClassMetricFileBuilder fileBuilder = new GodClassMetricFileBuilder();
 		fileBuilder.buildMetricFile("/Users/antoinebarbez/Desktop/metricFile.csv");

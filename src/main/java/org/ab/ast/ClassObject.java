@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ClassObject extends CodeComponent {
-	private boolean _Interface = false;
+	private boolean _interface = false;
 	private Set<FieldObject> fields = new HashSet<FieldObject>();
 	private Set<InnerClassObject> innerClasses = new HashSet<InnerClassObject>();
 	private Set<MethodObject> methods = new HashSet<MethodObject>();
@@ -55,10 +55,10 @@ public class ClassObject extends CodeComponent {
 	}
 	
 	public boolean isInterface() {
-		return _Interface;
+		return _interface;
 	}
 	
 	public void setInterface(boolean _interface) {
-		this._Interface = _interface;
+		this._interface = _interface;
 	}
 }
