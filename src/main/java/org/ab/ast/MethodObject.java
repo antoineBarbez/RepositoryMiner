@@ -6,6 +6,7 @@ import java.util.Set;
 public class MethodObject extends CodeComponent {
 	private String body = "";
 	private boolean constructor = false;
+	private boolean accessor = false;
 	private ClassObject declaringClass = null;
 	private Set<String> accessedFields = new HashSet<String>();
 	private Set<String> invokedMethods = new HashSet<String>();
@@ -39,19 +40,15 @@ public class MethodObject extends CodeComponent {
 	}
 	
 	public boolean isAccessor() {
-		if (body.split("\r\n|\r|\n+").length >1) {
-			return false;
-		}
-		
-		if (getName().startsWith("get") || getName().startsWith("set") || getName().startsWith("is")) {
-			return true;
-		}
-		
-		return false;
+		return accessor;
 	}
 	
 	public boolean isConstructor() {
 		return constructor;
+	}
+	
+	public void setAccessor(boolean accessor) {
+		this.accessor = accessor;
 	}
 	
 	public void setBody(String body) {

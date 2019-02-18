@@ -13,9 +13,9 @@ public class LCOM5 implements IUnaryClassMetric {
 		}
 		
 		int sum = 0;
-		for (FieldObject a: c.getFields()) {
+		for (FieldObject f: c.getFields()) {
 			for (MethodObject m: c.getMethods()) {
-				if (m.getAccessedFields().contains(a.getName())) {
+				if (m.getAccessedFields().contains(f.getName())) {
 					sum++;
 				}
 			}
