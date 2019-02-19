@@ -1,4 +1,4 @@
-package org.ab.ast.visitors;
+package org.ab.ast.parser;
 
 import org.ab.ast.FieldObject;
 import org.ab.ast.ClassObject;

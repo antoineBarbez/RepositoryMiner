@@ -10,6 +10,7 @@ import org.ab.ast.ClassObject;
 import org.ab.ast.FileObject;
 import org.ab.ast.SystemObject;
 import org.ab.metrics.IUnaryClassMetric;
+import org.ab.metrics.impl.ATFD;
 import org.ab.metrics.impl.LCOM5;
 import org.ab.metrics.impl.LOC;
 import org.ab.metrics.impl.NAD;
@@ -27,13 +28,14 @@ public class GodClassMetricFileBuilder implements IMetricFileBuilder {
 		metrics.add(new NAD());
 		metrics.add(new LCOM5());
 		metrics.add(new NADC());
+		metrics.add(new ATFD());
 	}
 	
 	@Override
 	public boolean buildMetricFile(String filePath) throws FileNotFoundException {
 		PrintWriter out = new PrintWriter(filePath);
 		
-		String header = "Class;LOC;NMD;NAD;LCOM5;NADC";
+		String header = "Class;LOC;NMD;NAD;LCOM5;NADC;ATFD";
 		out.println(header);
 
 		Iterator<String> iter = getLines().iterator();
