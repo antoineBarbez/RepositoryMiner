@@ -4,7 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ClassObject extends CodeComponent {
-	private boolean _interface = false;
+	private boolean _interface;
+	private String packageName;
+	private String superClass = null;
 	private Set<FieldObject> fields = new HashSet<FieldObject>();
 	private Set<InnerClassObject> innerClasses = new HashSet<InnerClassObject>();
 	private Set<MethodObject> methods = new HashSet<MethodObject>();
@@ -37,6 +39,18 @@ public class ClassObject extends CodeComponent {
 		return methods;
 	}
 	
+	public String getName() {
+		return packageName + "." + getIdentifier();
+	}
+	
+	public String getPackage() {
+		return packageName;
+	}
+	
+	public String getSuperClass() {
+		return superClass;
+	}
+	
 	public boolean isDataClass() {
 		int nbFields = fields.size();
 		int nbNonAccessorMethods = 0;
@@ -58,7 +72,23 @@ public class ClassObject extends CodeComponent {
 		return _interface;
 	}
 	
+	public boolean isRelatedTo(ClassObject aClass) {
+		if (aClass.getName().startsWith(this.getName()) || aClass.getName().equals(superClass)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public void setInterface(boolean _interface) {
 		this._interface = _interface;
+	}
+	
+	public void setPackage(String packageName) {
+		this.packageName = packageName;
+	}
+	
+	public void setSuperClass(String superClass) {
+		this.superClass = superClass;
 	}
 }

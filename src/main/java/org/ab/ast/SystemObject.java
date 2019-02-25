@@ -68,6 +68,18 @@ public class SystemObject {
 		return this.files;
 	}
 	
+	public Set<ClassObject> getClasses() {
+		return new HashSet<ClassObject>(classMap.values());
+	}
+	
+	public Set<MethodObject> getMethods() {
+		return new HashSet<MethodObject>(methodMap.values());
+	}
+	
+	public Set<FieldObject> getFields() {
+		return new HashSet<FieldObject>(fieldMap.values());
+	}
+	
 	public FileObject getFileByPath(String path) {
 		if (fileMap.containsKey(path)) {
 			return fileMap.get(path);

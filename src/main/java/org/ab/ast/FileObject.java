@@ -20,7 +20,7 @@ public class FileObject {
 		return this.classes;
 	}
 	
-	public String getPackageName() {
+	public String getPackage() {
 		return packageName;
 	}
 	
@@ -28,7 +28,7 @@ public class FileObject {
 		return path;
 	}
 	
-	public void setPackageName(String packageName) {
+	public void setPackage(String packageName) {
 		this.packageName = packageName;
 	}
 }

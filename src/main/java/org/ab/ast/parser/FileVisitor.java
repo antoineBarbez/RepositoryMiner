@@ -1,11 +1,12 @@
 package org.ab.ast.parser;
 
-import org.ab.ast.FieldObject;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.ab.ast.ClassObject;
 import org.ab.ast.FileObject;
-import org.ab.ast.InnerClassObject;
-import org.ab.ast.MethodObject;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
@@ -21,11 +22,10 @@ public class FileVisitor extends ASTVisitor {
 		return this.fileObject;
 	}
 	
-	
 	@Override
 	public boolean visit(PackageDeclaration node) {
 		String packageName = node.getName().getFullyQualifiedName();
-		fileObject.setPackageName(packageName);
+		fileObject.setPackage(packageName);
 		return true;
 	}
 	
@@ -37,29 +37,24 @@ public class FileVisitor extends ASTVisitor {
 		}
 		
 		// Visit the class.
-		ClassVisitor visitor = new ClassVisitor(node.getName().resolveTypeBinding().getQualifiedName(), false);
+		ClassVisitor visitor = new ClassVisitor(node.getName().getIdentifier(), false);
 		node.accept(visitor);
 		
 		ClassObject c = visitor.getClassObject();
 		
-		c.setInterface(node.isInterface());
+		if (node.getSuperclassType() != null) {
+			ITypeBinding bind = node.getSuperclassType().resolveBinding();
+			c.setSuperClass(bind.getQualifiedName());
+		}
 		
+		Set<String> modifiers = new HashSet<String>();
 		for (Object modifier: node.modifiers()) {
-			c.addModifier(modifier.toString());
+			modifiers.add(modifier.toString());
 		}
 		
-		for (FieldObject f: c.getFields()) {
-			f.setDeclaringClass(c);
-		}
-		
-		for (MethodObject m: c.getMethods()) {
-			m.setDeclaringClass(c);
-		}
-		
-		for (InnerClassObject ic: c.getInnerClasses()) {
-			ic.setDeclaringClass(c);
-		}
-		
+		c.setInterface(node.isInterface());
+		c.setModifiers(modifiers);
+		c.setPackage(fileObject.getPackage());
 		fileObject.addClass(c);
 		
 		return true;

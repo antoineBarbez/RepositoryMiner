@@ -1,13 +1,16 @@
-package org.ab.metrics.impl;
+package org.ab.metrics;
 
 import org.ab.ast.FieldObject;
 import org.ab.ast.ClassObject;
 import org.ab.ast.MethodObject;
-import org.ab.metrics.IUnaryClassMetric;
 
-public class LCOM5 implements IUnaryClassMetric {
+/*
+ * LCOM5: Lack of COhesion in Methods (Version 5).
+ */
+
+public class LCOM5 {
 	
-	public double compute(ClassObject c) {
+	public static double compute(ClassObject c) {
 		if (c.getMethods().size() < 2 || c.getFields().size() ==0) {
 			return 0;
 		}
@@ -26,9 +29,5 @@ public class LCOM5 implements IUnaryClassMetric {
 		final double lcom5Value = num / den;
 		
 		return lcom5Value;
-	}
-	
-	public String getName() {
-		return "LCOM5";
 	}
 }

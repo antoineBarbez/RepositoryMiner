@@ -1,25 +1,24 @@
 package org.ab.ast;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public abstract class CodeComponent {
-	private String name;
-	private Set<String> modifiers = new HashSet<String>();
+	private String identifier;
+	private Set<String> modifiers;
 	
-	public CodeComponent(String name) {
-		this.name = name;
+	public CodeComponent(String identifier) {
+		this.identifier = identifier;
 	}
 	
-	public void addModifier(String modifier) {
-		modifiers.add(modifier);
-	}
-	
-	public String getName() {
-		return name;
+	public String getIdentifier() {
+		return identifier;
 	}
 	
 	public Set<String> getModifiers() {
 		return modifiers;
+	}
+	
+	public void setModifiers(Set<String> modifiers) {
+		this.modifiers = modifiers;
 	}
 }

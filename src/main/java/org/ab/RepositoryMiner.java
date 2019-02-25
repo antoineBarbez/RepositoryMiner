@@ -1,5 +1,6 @@
 package org.ab;
 
+import org.ab.mfb.FeatureEnvyMetricFileBuilder;
 import org.ab.mfb.GodClassMetricFileBuilder;
 
 public class RepositoryMiner {
@@ -15,9 +16,10 @@ public class RepositoryMiner {
 		Git git = new Git(repoFolder);
 		git.checkout(sha, new String[]{"v4"});
 		
-		GodClassMetricFileBuilder fileBuilder = new GodClassMetricFileBuilder();
-		fileBuilder.buildMetricFile("/Users/antoinebarbez/Desktop/metricFile.csv");
+		GodClassMetricFileBuilder classFileBuilder = new GodClassMetricFileBuilder();
+		classFileBuilder.buildMetricFile("/Users/antoinebarbez/Desktop/class_metrics.csv");
 		
-		
+		FeatureEnvyMetricFileBuilder methodFileBuilder = new FeatureEnvyMetricFileBuilder();
+		methodFileBuilder.buildMetricFile("/Users/antoinebarbez/Desktop/method_metrics.csv");
 	}
 }

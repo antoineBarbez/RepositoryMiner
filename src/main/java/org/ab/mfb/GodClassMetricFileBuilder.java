@@ -9,27 +9,14 @@ import java.util.List;
 import org.ab.ast.ClassObject;
 import org.ab.ast.FileObject;
 import org.ab.ast.SystemObject;
-import org.ab.metrics.IUnaryClassMetric;
-import org.ab.metrics.impl.ATFD;
-import org.ab.metrics.impl.LCOM5;
-import org.ab.metrics.impl.LOC;
-import org.ab.metrics.impl.NAD;
-import org.ab.metrics.impl.NADC;
-import org.ab.metrics.impl.NMD;
+import org.ab.metrics.ATFD;
+import org.ab.metrics.LCOM5;
+import org.ab.metrics.LOC;
+import org.ab.metrics.NAD;
+import org.ab.metrics.NADC;
+import org.ab.metrics.NMD;
 
 public class GodClassMetricFileBuilder implements IMetricFileBuilder {
-	private List<IUnaryClassMetric> metrics;
-	
-	public GodClassMetricFileBuilder() {
-		metrics = new ArrayList<IUnaryClassMetric>();
-		
-		metrics.add(new LOC());
-		metrics.add(new NMD());
-		metrics.add(new NAD());
-		metrics.add(new LCOM5());
-		metrics.add(new NADC());
-		metrics.add(new ATFD());
-	}
 	
 	@Override
 	public boolean buildMetricFile(String filePath) throws FileNotFoundException {
@@ -58,10 +45,18 @@ public class GodClassMetricFileBuilder implements IMetricFileBuilder {
 			for (ClassObject c : f.getClasses()) {
 				StringBuffer lineBuffer = new StringBuffer();
 				lineBuffer.append(c.getName());
-				for (IUnaryClassMetric metric: metrics) {
-					lineBuffer.append(";");
-					lineBuffer.append(String.valueOf(metric.compute(c)));
-				}
+				lineBuffer.append(";");
+				lineBuffer.append(String.valueOf(LOC.compute(c)));
+				lineBuffer.append(";");
+				lineBuffer.append(String.valueOf(NMD.compute(c)));
+				lineBuffer.append(";");
+				lineBuffer.append(String.valueOf(NAD.compute(c)));
+				lineBuffer.append(";");
+				lineBuffer.append(String.valueOf(LCOM5.compute(c)));
+				lineBuffer.append(";");
+				lineBuffer.append(String.valueOf(NADC.compute(c)));
+				lineBuffer.append(";");
+				lineBuffer.append(String.valueOf(ATFD.compute(c)));
 				lines.add(lineBuffer.toString());
 			}
 		}
