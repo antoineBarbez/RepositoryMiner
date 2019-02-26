@@ -8,7 +8,7 @@ import org.ab.ast.ClassObject;
 
 public class NAD {
 
-	public static double compute(ClassObject c) {
+	public static int compute(ClassObject c) {
 		return c.getFields().size();
 	}
 }

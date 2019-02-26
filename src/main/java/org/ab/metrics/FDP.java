@@ -15,7 +15,7 @@ import org.ab.ast.SystemObject;
 
 public class FDP {
 
-	public static double compute(ClassObject c) {
+	public static int compute(ClassObject c) {
 		SystemObject s = SystemObject.getInstance();
 		
 		Set<String> foreignDataProviders = new HashSet<String>();
@@ -37,7 +37,7 @@ public class FDP {
 		return foreignDataProviders.size();
 	}
 	
-	public static double compute(MethodObject m) {
+	public static int compute(MethodObject m) {
 		SystemObject s = SystemObject.getInstance();
 		ClassObject delaringClass = m.getDeclaringClass();
 		Set<String> foreignDataProviders = new HashSet<String>();

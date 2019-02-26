@@ -13,7 +13,7 @@ import org.ab.ast.MethodObject;
 
 public class NMD {
 	
-	public static double compute(ClassObject c) {
+	public static int compute(ClassObject c) {
 		Set<String> nam = new HashSet<String>();
 		for (MethodObject m: c.getMethods()) {
 			if (!m.isAccessor()) {

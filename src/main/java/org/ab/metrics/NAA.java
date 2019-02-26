@@ -14,7 +14,7 @@ import org.ab.ast.SystemObject;
  */
 public class NAA {
 	
-	public static double compute(MethodObject m, ClassObject c) {
+	public static int compute(MethodObject m, ClassObject c) {
 		SystemObject s = SystemObject.getInstance();
 		
 		Set<String> accessedAttributes = new HashSet<String>();

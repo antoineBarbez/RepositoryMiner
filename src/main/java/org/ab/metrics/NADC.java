@@ -14,7 +14,7 @@ import org.ab.ast.SystemObject;
 
 public class NADC {
 	
-	public static double compute(ClassObject c) {
+	public static int compute(ClassObject c) {
 		SystemObject s = SystemObject.getInstance();
 		
 		Set<ClassObject> accessedDataClasses = new HashSet<ClassObject>();
@@ -42,7 +42,7 @@ public class NADC {
 		return accessedDataClasses.size();
 	}
 	
-	public static double compute(MethodObject m) {
+	public static int compute(MethodObject m) {
 		SystemObject s = SystemObject.getInstance();
 		
 		Set<ClassObject> accessedDataClasses = new HashSet<ClassObject>();

@@ -8,15 +8,15 @@ import org.ab.ast.MethodObject;
  */
 public class LOC {
 	
-	public static double compute(ClassObject c) {
-		double loc = 0;
+	public static int compute(ClassObject c) {
+		int loc = 0;
 		for (MethodObject m: c.getMethods()) {
 			loc += compute(m);
 		}
 		return loc;
 	}
 	
-	public static double compute(MethodObject m) {
+	public static int compute(MethodObject m) {
 		if (m.getBody() == null) {
 			return 0;
 		}
