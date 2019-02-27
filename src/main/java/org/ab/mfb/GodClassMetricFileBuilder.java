@@ -15,6 +15,7 @@ import org.ab.metrics.LOC;
 import org.ab.metrics.NAD;
 import org.ab.metrics.NADC;
 import org.ab.metrics.NMD;
+import org.ab.metrics.WMC;
 
 public class GodClassMetricFileBuilder implements IMetricFileBuilder {
 	
@@ -22,7 +23,7 @@ public class GodClassMetricFileBuilder implements IMetricFileBuilder {
 	public boolean buildMetricFile(String filePath) throws FileNotFoundException {
 		PrintWriter out = new PrintWriter(filePath);
 		
-		String header = "Class;LOC;NMD;NAD;LCOM5;NADC;ATFD";
+		String header = "Class;LOC;NMD;NAD;LCOM5;NADC;ATFD;WMC";
 		out.println(header);
 
 		Iterator<String> iter = getLines().iterator();
@@ -57,6 +58,8 @@ public class GodClassMetricFileBuilder implements IMetricFileBuilder {
 				lineBuffer.append(String.valueOf(NADC.compute(c)));
 				lineBuffer.append(";");
 				lineBuffer.append(String.valueOf(ATFD.compute(c)));
+				lineBuffer.append(";");
+				lineBuffer.append(String.valueOf(WMC.compute(c)));
 				lines.add(lineBuffer.toString());
 			}
 		}
