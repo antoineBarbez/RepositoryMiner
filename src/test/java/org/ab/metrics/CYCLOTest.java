@@ -41,44 +41,44 @@ public class CYCLOTest {
 	}
 
 	@Test
+	// Multiple if with &&, for and conditional expression
 	public void testM1() {
-		// Multiple if with &&, for and conditional expression
 		assertEquals(8, CYCLO.compute(m1));
 	}
 	
 	@Test
+	// Multiple if , while
 	public void testM2() {
-		// Multiple if , while
 		assertEquals(8, CYCLO.compute(m2));
 	}
 	
 	@Test
+	// Multiple if with ||
 	public void testM3() {
-		// Multiple if with ||
 		assertEquals(6, CYCLO.compute(m3));
 	}
 
 	@Test
+	// While and catch
 	public void testM4() {
-		// while and catch
 		assertEquals(3, CYCLO.compute(m4));
 	}
 	
 	@Test
+	// If and switch
 	public void testM5() {
-		// if and switch
 		assertEquals(4, CYCLO.compute(m5));
 	}
 	
 	@Test
+	// Simple accessor method
 	public void testM6() {
-		// simple accessor method
 		assertEquals(1, CYCLO.compute(m6));
 	}
 	
 	@Test
+	// Interface method
 	public void testM7() {
-		// Interface method
 		assertEquals(1, CYCLO.compute(m7));
 	}
 }

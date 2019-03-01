@@ -5,6 +5,7 @@ import org.ab.ast.MethodObject;
 
 /*
  * LOC: Lines Of Code.
+ * Ignores comments and blank lines
  */
 public class LOC {
 	
@@ -18,9 +19,11 @@ public class LOC {
 	
 	public static int compute(MethodObject m) {
 		if (m.getBody() == null) {
-			return 0;
+			return 1;
 		}
-		
-		return m.getBody().toString().split("\r\n|\r|\n+").length;
+		 
+		// Block.toString() already suppress comments and blank lines
+		// so they don't have to be handled in the regex.
+		return m.getBody().toString().split("\r\n|\r|\n").length;
 	}
 }

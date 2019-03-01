@@ -32,25 +32,11 @@ public class MethodVisitor extends ASTVisitor {
 				if (vBind.isField()) {
 					ITypeBinding cBind = vBind.getDeclaringClass();
 					if (cBind != null) {
-						String declaringClass;
-						if (vBind.getDeclaringClass().isParameterizedType()) {
-							declaringClass = vBind.getDeclaringClass().getTypeDeclaration().getQualifiedName();
-						}else {
-							declaringClass = vBind.getDeclaringClass().getQualifiedName();
-						}
-						
-						methodObject.addAccessedField(declaringClass + "." + vBind.getName());
+						methodObject.addAccessedField(vBind.getDeclaringClass().getTypeDeclaration().getQualifiedName() + "." + vBind.getName());
 					}
 				}
 			}else if (bind.getKind() == IBinding.METHOD) {
 				IMethodBinding mBind = (IMethodBinding) bind;
-				
-				String declaringClass;
-				if (mBind.getDeclaringClass().isParameterizedType()) {
-					declaringClass = mBind.getDeclaringClass().getTypeDeclaration().getQualifiedName();
-				}else {
-					declaringClass = mBind.getDeclaringClass().getQualifiedName();
-				}
 
 				List<String> params = new ArrayList<>();
 				for (ITypeBinding paramType : mBind.getParameterTypes()) {
@@ -58,14 +44,14 @@ public class MethodVisitor extends ASTVisitor {
 				}
 				
 				StringBuffer buffer = new StringBuffer();
-				buffer.append(mBind.getName());
+				buffer.append(mBind.getDeclaringClass().getTypeDeclaration().getQualifiedName() + "." + mBind.getName());
 				buffer.append("(");
 				buffer.append(String.join(", ", params));
 				buffer.append(")");
 				
 				String methodName = buffer.toString();
 				
-				methodObject.addInvokedMethod(declaringClass + "." + methodName);
+				methodObject.addInvokedMethod(methodName);
 			}
 		}
 	

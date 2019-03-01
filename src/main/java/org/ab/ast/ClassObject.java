@@ -5,8 +5,8 @@ import java.util.Set;
 
 public class ClassObject extends CodeComponent {
 	private boolean _interface;
-	private String packageName;
-	private String superClass = null;
+	private FileObject file;
+	private String superClassName = null;
 	private Set<FieldObject> fields = new HashSet<FieldObject>();
 	private Set<InnerClassObject> innerClasses = new HashSet<InnerClassObject>();
 	private Set<MethodObject> methods = new HashSet<MethodObject>();
@@ -31,6 +31,10 @@ public class ClassObject extends CodeComponent {
 		return fields;
 	}
 	
+	public FileObject getFile() {
+		return file;
+	}
+	
 	public Set<InnerClassObject> getInnerClasses() {
 		return innerClasses;
 	}
@@ -40,15 +44,35 @@ public class ClassObject extends CodeComponent {
 	}
 	
 	public String getName() {
-		return packageName + "." + getIdentifier();
+		String packageName = file.getPackage();
+		if (packageName != null) {
+			return packageName + "." + getIdentifier();
+		}
+		return getIdentifier();
 	}
 	
-	public String getPackage() {
-		return packageName;
+	public ClassObject getSuperClass() {
+		if (superClassName == null) {
+			return null;
+		}
+		
+		SystemObject s = SystemObject.getInstance();
+		return s.getClassByName(superClassName);
 	}
 	
-	public String getSuperClass() {
-		return superClass;
+	public boolean inheritFrom(ClassObject aClass) {
+		ClassObject superClass = getSuperClass();
+		if (aClass == null || superClass == null) {
+			return false;
+		}
+		
+		while (superClass != null) {
+			if (superClass.getName().equals(aClass.getName())) {
+				return true;
+			}
+			superClass = superClass.getSuperClass();
+		}
+		return false;
 	}
 	
 	public boolean isDataClass() {
@@ -73,22 +97,37 @@ public class ClassObject extends CodeComponent {
 	}
 	
 	public boolean isRelatedTo(ClassObject aClass) {
-		if (aClass.getName().startsWith(this.getName()) || aClass.getName().equals(superClass)) {
+		/*// Check if it is the same class
+		if (aClass.getName().equals(this.getName())) {
+			return true;
+		}
+		
+		// Check for belonging relationship
+		if (aClass.getName().startsWith(this.getName() + ".") || this.getName().startsWith(aClass.getName() + ".")) {
+			return true;
+		}*/
+		
+		if (aClass.getFile().getPath().equals(this.getFile().getPath())) {
+			return true;
+		}
+		
+		// Check for inheritance relationship
+		if (aClass.inheritFrom(this) || this.inheritFrom(aClass)) {
 			return true;
 		}
 		
 		return false;
 	}
 	
+	public void setFile(FileObject file) {
+		this.file = file;
+	}
+	
 	public void setInterface(boolean _interface) {
 		this._interface = _interface;
 	}
 	
-	public void setPackage(String packageName) {
-		this.packageName = packageName;
-	}
-	
-	public void setSuperClass(String superClass) {
-		this.superClass = superClass;
+	public void setSuperClassName(String superClassName) {
+		this.superClassName = superClassName;
 	}
 }

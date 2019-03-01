@@ -54,7 +54,7 @@ public class ClassVisitor extends ASTVisitor {
 		
 		if (node.getSuperclassType() != null) {
 			ITypeBinding bind = node.getSuperclassType().resolveBinding();
-			c.setSuperClass(bind.getQualifiedName());
+			c.setSuperClassName(bind.getTypeDeclaration().getQualifiedName());
 		}
 		
 		Set<String> modifiers = new HashSet<String>();

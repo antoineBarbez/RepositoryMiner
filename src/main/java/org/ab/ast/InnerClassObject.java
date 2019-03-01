@@ -3,8 +3,8 @@ package org.ab.ast;
 public class InnerClassObject extends ClassObject {
 	private ClassObject declaringClass;
 	
-	public InnerClassObject(String name) {
-		super(name);
+	public InnerClassObject(String identifier) {
+		super(identifier);
 	}
 	
 	public ClassObject getDeclaringClass() {
@@ -27,5 +27,10 @@ public class InnerClassObject extends ClassObject {
 	
 	public void setDeclaringClass(ClassObject declaringClass) {
 		this.declaringClass = declaringClass;
+	}
+	
+	@Override
+	public FileObject getFile() {
+		return declaringClass.getFile();
 	}
 }
