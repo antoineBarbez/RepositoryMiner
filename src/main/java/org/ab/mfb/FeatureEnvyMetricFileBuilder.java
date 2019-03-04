@@ -50,14 +50,14 @@ public class FeatureEnvyMetricFileBuilder implements IMetricFileBuilder {
 				Set<ClassObject> accessedClasses = new HashSet<ClassObject>();
 				for (String accessedFieldName: m.getAccessedFields()) {
 					FieldObject accessedField = s.getFieldByName(accessedFieldName);
-					if (accessedField != null && !accessedField.getDeclaringClass().equals(m.getDeclaringClass())) {
+					if (accessedField != null && !m.getDeclaringClass().isRelatedTo(accessedField.getDeclaringClass())) {
 						accessedClasses.add(accessedField.getDeclaringClass());
 					}
 				}
 				
 				for (String invokedMethodName: m.getInvokedMethods()) {
 					MethodObject invokedMethod = s.getMethodByName(invokedMethodName);
-					if (invokedMethod != null && !invokedMethod.getDeclaringClass().equals(m.getDeclaringClass())) {
+					if (invokedMethod != null && !m.getDeclaringClass().isRelatedTo(invokedMethod.getDeclaringClass())) {
 						accessedClasses.add(invokedMethod.getDeclaringClass());
 					}
 				}

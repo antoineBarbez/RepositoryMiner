@@ -23,7 +23,7 @@ public class NADC {
 				FieldObject accessedField = s.getFieldByName(accessedFieldName);
 				if (accessedField != null) {
 					ClassObject accessedClass = accessedField.getDeclaringClass();
-					if (accessedClass.isDataClass()) {
+					if (!accessedClass.getName().equals(c.getName()) && accessedClass.isDataClass()) {
 						accessedDataClasses.add(accessedClass);
 					}
 				}
@@ -33,7 +33,7 @@ public class NADC {
 				MethodObject invokedMethod = s.getMethodByName(invokedMethodName);
 				if (invokedMethod != null) {
 					ClassObject accessedClass = invokedMethod.getDeclaringClass();
-					if (accessedClass.isDataClass()) {
+					if (!accessedClass.getName().equals(c.getName()) && accessedClass.isDataClass()) {
 						accessedDataClasses.add(accessedClass);
 					}
 				}
@@ -45,12 +45,13 @@ public class NADC {
 	public static int compute(MethodObject m) {
 		SystemObject s = SystemObject.getInstance();
 		
+		ClassObject c = m.getDeclaringClass();
 		Set<ClassObject> accessedDataClasses = new HashSet<ClassObject>();
 		for (String accessedFieldName: m.getAccessedFields()) {
 			FieldObject accessedField = s.getFieldByName(accessedFieldName);
 			if (accessedField != null) {
 				ClassObject accessedClass = accessedField.getDeclaringClass();
-				if (accessedClass.isDataClass()) {
+				if (!accessedClass.getName().equals(c.getName()) && accessedClass.isDataClass()) {
 					accessedDataClasses.add(accessedClass);
 				}
 			}
@@ -60,7 +61,7 @@ public class NADC {
 			MethodObject invokedMethod = s.getMethodByName(invokedMethodName);
 			if (invokedMethod != null) {
 				ClassObject accessedClass = invokedMethod.getDeclaringClass();
-				if (accessedClass.isDataClass()) {
+				if (!accessedClass.getName().equals(c.getName()) && accessedClass.isDataClass()) {
 					accessedDataClasses.add(accessedClass);
 				}
 			}

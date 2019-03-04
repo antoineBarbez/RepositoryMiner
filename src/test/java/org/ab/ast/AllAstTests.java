@@ -11,7 +11,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 
 @Suite.SuiteClasses({ 
-   ClassObjectTest.class
+   ClassObjectTest.class,
+   MethodObjectTest.class
 })
 
 public class AllAstTests {
