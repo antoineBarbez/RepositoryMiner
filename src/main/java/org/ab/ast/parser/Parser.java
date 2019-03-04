@@ -18,7 +18,7 @@ public class Parser {
 	private String repoPath;
 	private String[] sourcepathEntries;
 	
-	public Parser(String repoPath) {
+	public Parser(String repoPath) throws IOException {
 		this.repoPath = repoPath;
 		this.sourcepathEntries = getSourcepathEntries(repoPath);
 	}
@@ -44,58 +44,62 @@ public class Parser {
 		return visitor.getFileObject();
 	}
 	
-	public void updateSourcepathEntries() {
+	public void updateSourcepathEntries() throws IOException {
 		sourcepathEntries = getSourcepathEntries(repoPath);
 	}
 	
-	private String[] getSourcepathEntries(String rootDirPath) {
+	
+	/**
+	 * 
+	 * @param rootDirPath the repository directory.
+	 * @return Returns all the sourcepath entries, i.e., the first parent directories of packages.
+	 * Example: if a java file: "/.../project/src/java/org/package/MyClass.java" declares "package org.package;",
+	 * Then, "/.../project/src/java/" is a sourcepath entry.  
+	 */
+	private String[] getSourcepathEntries(String rootDirPath) throws IOException {
 		File rootDir = new File(rootDirPath);
 		Set<String> sourcepathEntries = new HashSet<String>();
-		Set<File> subDirectories = getDirectories(rootDir);
-		for (File subDirectory: subDirectories) {
-			String sourceDir=null;
-			try {
-				sourceDir = getSourceDir(subDirectory);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			if (sourceDir != null) {
-				sourcepathEntries.add(sourceDir);
+		for (File subDirectory: getSubDirectoriesRecursively(rootDir)) {
+			String sourcepathEntry = getSourcepathEntry(subDirectory);
+			if (sourcepathEntry != null) {
+				sourcepathEntries.add(sourcepathEntry);
 			}
 		}
-		
 		return sourcepathEntries.toArray(new String[sourcepathEntries.size()]);
 	}
 	
-	private Set<File> getDirectories(File directory) {
+	private Set<File> getSubDirectoriesRecursively(File directory) {
 		Set<File> directories = new HashSet<File>();
 		File[] files = directory.listFiles();
 		for (File file : files) {
 			if (file.isDirectory() && !file.getName().equals(".git")) {
 				directories.add(file);
-				directories.addAll(getDirectories(file));
+				directories.addAll(getSubDirectoriesRecursively(file));
 			}
 		}
-		
 		return directories;
 	}
 	
-	private String getSourceDir(File directory) throws IOException {
+	private String getSourcepathEntry(File directory) throws IOException {
 		File[] files = directory.listFiles();
 		for (File file : files) {
 			if (file.getName().endsWith(".java")) {
 				String fileString = FileUtils.readFileToString(file, "UTF-8");
-				Pattern p = Pattern.compile("package\\s+(.+);");
+				Pattern p = Pattern.compile("^[\\s\\t]*package\\s+(.+);");
 				Matcher m = p.matcher(fileString);
 				if(m.find()) {
-					String sourcePath = "/"+ directory.getAbsolutePath().substring(1,directory.getAbsolutePath().length()- m.group(1).length());
-					File sourceFile = new File(sourcePath);
-					if (sourceFile.exists())
-						return sourcePath;
+					String packageRelativePath = m.group(1).replaceAll("\\.", "/");
+					String directoryPath = directory.getAbsolutePath();
+					if (directoryPath.endsWith(packageRelativePath)) {
+						String sourcePathEntry = directoryPath.substring(0, directoryPath.length() - packageRelativePath.length());
+						File sourcePathEntryFile = new File(sourcePathEntry);
+						if (sourcePathEntryFile.exists()) {
+							return sourcePathEntry;
+						}
+					}
 				}
 			}
 		}
-		
-		return null;	
+		return null;
 	}
 }

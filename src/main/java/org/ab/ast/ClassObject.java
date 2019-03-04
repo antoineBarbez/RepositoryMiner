@@ -75,15 +75,15 @@ public abstract class ClassObject extends CodeComponent {
 	
 	public boolean isDataClass() {
 		int nbFields = fields.size();
-		int nbNonAccessorMethods = 0;
+		int nbMethods = 0;
 		for (MethodObject m: methods) {
-			if (!m.isAccessor()) {
-				nbNonAccessorMethods++;
+			if (!m.isAccessor() && !m.isConstructor()) {
+				nbMethods++;
 			}
 		}
-		nbNonAccessorMethods = Integer.max(1, nbNonAccessorMethods);
+		nbMethods = Integer.max(1, nbMethods);
 		
-		double ratio = nbFields/nbNonAccessorMethods;
+		double ratio = nbFields/nbMethods;
 		if (ratio >= 7) {
 			return true;
 		}

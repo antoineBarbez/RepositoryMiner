@@ -16,7 +16,7 @@ public class Git {
 	private String gitPrefix;
 	private Parser parser;
 	
-	public Git(String repoPath) {
+	public Git(String repoPath) throws IOException {
 		this.repoPath = FilenameUtils.normalizeNoEndSeparator(repoPath);
 		this.gitPrefix = "git --git-dir=" + this.repoPath + "/.git" ;
 		this.parser = new Parser(repoPath);
@@ -24,6 +24,7 @@ public class Git {
 	
 	public void checkout(String sha, String[] dirsToAnalyze) throws IOException {
 		actuallyCheckout(sha);
+		parser.updateSourcepathEntries();
 		
 		for (int i=0;i<dirsToAnalyze.length;i++) {
 			Collection<File> filesInDirectory = FileUtils.listFiles(new File(repoPath + '/' + dirsToAnalyze[i]), new String[]{"java"}, true);
