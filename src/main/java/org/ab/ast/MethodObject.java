@@ -49,6 +49,7 @@ public class MethodObject extends CodeComponent {
 		return invokedMethods;
 	}
 	
+	@Override
 	public String getName() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(declaringClass.getName() + "." + getIdentifier());

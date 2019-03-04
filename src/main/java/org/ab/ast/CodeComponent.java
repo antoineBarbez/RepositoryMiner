@@ -18,6 +18,8 @@ public abstract class CodeComponent {
 		return modifiers;
 	}
 	
+	public abstract String getName();
+	
 	public void setModifiers(Set<String> modifiers) {
 		this.modifiers = modifiers;
 	}

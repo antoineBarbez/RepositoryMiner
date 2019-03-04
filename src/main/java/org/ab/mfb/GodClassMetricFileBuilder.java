@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.ab.ast.ClassObject;
 import org.ab.ast.FileObject;
 import org.ab.ast.SystemObject;
+import org.ab.ast.TopLevelClassObject;
 import org.ab.metrics.ATFD;
 import org.ab.metrics.LCOM5;
 import org.ab.metrics.LOC;
@@ -43,7 +43,7 @@ public class GodClassMetricFileBuilder implements IMetricFileBuilder {
 		
 		List<String> lines = new ArrayList<String>();
 		for (FileObject f: s.getFiles()) {
-			for (ClassObject c : f.getClasses()) {
+			for (TopLevelClassObject c : f.getTopLevelClasses()) {
 				StringBuffer lineBuffer = new StringBuffer();
 				lineBuffer.append(c.getName());
 				lineBuffer.append(";");

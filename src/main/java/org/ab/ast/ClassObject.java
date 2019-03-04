@@ -3,16 +3,15 @@ package org.ab.ast;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ClassObject extends CodeComponent {
+public abstract class ClassObject extends CodeComponent {
 	private boolean _interface;
-	private FileObject file;
 	private String superClassName = null;
 	private Set<FieldObject> fields = new HashSet<FieldObject>();
 	private Set<InnerClassObject> innerClasses = new HashSet<InnerClassObject>();
 	private Set<MethodObject> methods = new HashSet<MethodObject>();
 	
-	public ClassObject(String name) {
-		super(name);
+	public ClassObject(String identifier) {
+		super(identifier);
 	}
 	
 	public void addField(FieldObject field) {
@@ -31,9 +30,7 @@ public class ClassObject extends CodeComponent {
 		return fields;
 	}
 	
-	public FileObject getFile() {
-		return file;
-	}
+	public abstract FileObject getFile();
 	
 	public Set<InnerClassObject> getInnerClasses() {
 		return innerClasses;
@@ -43,8 +40,9 @@ public class ClassObject extends CodeComponent {
 		return methods;
 	}
 	
+	@Override
 	public String getName() {
-		String packageName = file.getPackage();
+		String packageName = this.getFile().getPackage();
 		if (packageName != null) {
 			return packageName + "." + getIdentifier();
 		}
@@ -97,16 +95,6 @@ public class ClassObject extends CodeComponent {
 	}
 	
 	public boolean isRelatedTo(ClassObject aClass) {
-		/*// Check if it is the same class
-		if (aClass.getName().equals(this.getName())) {
-			return true;
-		}
-		
-		// Check for belonging relationship
-		if (aClass.getName().startsWith(this.getName() + ".") || this.getName().startsWith(aClass.getName() + ".")) {
-			return true;
-		}*/
-		
 		if (aClass.getFile().getPath().equals(this.getFile().getPath())) {
 			return true;
 		}
@@ -117,10 +105,6 @@ public class ClassObject extends CodeComponent {
 		}
 		
 		return false;
-	}
-	
-	public void setFile(FileObject file) {
-		this.file = file;
 	}
 	
 	public void setInterface(boolean _interface) {

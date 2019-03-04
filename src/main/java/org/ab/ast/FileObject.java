@@ -6,18 +6,18 @@ import java.util.Set;
 public class FileObject {
 	private String path;
 	private String packageName;
-	private Set<ClassObject> classes  = new HashSet<ClassObject>();
+	private Set<TopLevelClassObject> topLevelClasses  = new HashSet<TopLevelClassObject>();
 	
 	public FileObject(String path) {
 		this.path = path;
 	}
 	
-	public void addClass(ClassObject c) {
-		this.classes.add(c);
+	public void addTopLevelClass(TopLevelClassObject c) {
+		this.topLevelClasses.add(c);
 	}
 	
-	public Set<ClassObject> getClasses() {
-		return this.classes;
+	public Set<TopLevelClassObject> getTopLevelClasses() {
+		return this.topLevelClasses;
 	}
 	
 	public String getPackage() {

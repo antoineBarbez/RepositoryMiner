@@ -2,6 +2,8 @@ package org.ab.ast;
 
 import static org.junit.Assert.*;
 
+import java.util.Set;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -43,7 +45,7 @@ public class ClassObjectTest {
 		assertEquals(9, nonPublicTopLevelClass.getFields().size());
 		assertEquals(7, parameterizedClass.getFields().size());
 	}
-	
+		
 	@Test
 	public void getInnerClassesTest() {
 		assertEquals(0, interfaceClass.getInnerClasses().size());

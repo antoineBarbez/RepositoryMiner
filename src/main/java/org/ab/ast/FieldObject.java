@@ -11,6 +11,7 @@ public class FieldObject extends CodeComponent {
 		return declaringClass;
 	}
 	
+	@Override
 	public String getName() {
 		return declaringClass.getName() + "." + getIdentifier();
 	}

@@ -3,8 +3,8 @@ package org.ab.ast.parser;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.ab.ast.ClassObject;
 import org.ab.ast.FileObject;
+import org.ab.ast.TopLevelClassObject;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
@@ -40,7 +40,7 @@ public class FileVisitor extends ASTVisitor {
 		ClassVisitor visitor = new ClassVisitor(node.getName().getIdentifier(), false);
 		node.accept(visitor);
 		
-		ClassObject c = visitor.getClassObject();
+		TopLevelClassObject c = (TopLevelClassObject) visitor.getClassObject();
 		
 		if (node.getSuperclassType() != null) {
 			ITypeBinding bind = node.getSuperclassType().resolveBinding();
@@ -55,7 +55,7 @@ public class FileVisitor extends ASTVisitor {
 		c.setFile(fileObject);
 		c.setInterface(node.isInterface());
 		c.setModifiers(modifiers);
-		fileObject.addClass(c);
+		fileObject.addTopLevelClass(c);
 		
 		return true;
 	}

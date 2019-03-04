@@ -9,6 +9,7 @@ import org.ab.ast.FieldObject;
 import org.ab.ast.ClassObject;
 import org.ab.ast.InnerClassObject;
 import org.ab.ast.MethodObject;
+import org.ab.ast.TopLevelClassObject;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -26,7 +27,7 @@ public class ClassVisitor extends ASTVisitor {
 		if (isInnerClass) {
 			classObject = new InnerClassObject(className);
 		}else {
-			classObject = new ClassObject(className);
+			classObject = new TopLevelClassObject(className);
 		}
 	}
 	
