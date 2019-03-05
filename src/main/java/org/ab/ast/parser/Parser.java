@@ -85,7 +85,7 @@ public class Parser {
 		for (File file : files) {
 			if (file.getName().endsWith(".java")) {
 				String fileString = FileUtils.readFileToString(file, "UTF-8");
-				Pattern p = Pattern.compile("^[\\s\\t]*package\\s+(.+);");
+				Pattern p = Pattern.compile("package\\s+(.+);");
 				Matcher m = p.matcher(fileString);
 				if(m.find()) {
 					String packageRelativePath = m.group(1).replaceAll("\\.", "/");

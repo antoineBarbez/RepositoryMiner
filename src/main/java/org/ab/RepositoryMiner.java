@@ -11,7 +11,7 @@ public class RepositoryMiner {
 		}
 		
 		if (args.length == 3) {
-			mine(args[0], args[1], new String[]{"v4"}, args[2]);
+			mine(args[0], args[1], new String[]{""}, args[2]);
 		}
 		
 		if (args.length == 4) {

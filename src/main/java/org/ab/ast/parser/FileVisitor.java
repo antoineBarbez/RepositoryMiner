@@ -44,7 +44,9 @@ public class FileVisitor extends ASTVisitor {
 		
 		if (node.getSuperclassType() != null) {
 			ITypeBinding bind = node.getSuperclassType().resolveBinding();
-			c.setSuperClassName(bind.getTypeDeclaration().getQualifiedName());
+			if (bind != null) {
+				c.setSuperClassName(bind.getTypeDeclaration().getQualifiedName());
+			}
 		}
 		
 		Set<String> modifiers = new HashSet<String>();

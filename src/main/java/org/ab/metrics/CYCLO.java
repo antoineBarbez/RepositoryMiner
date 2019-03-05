@@ -28,6 +28,8 @@ public class CYCLO {
 	}
 }
 
+// Must try/catch when visiting nodes' expressions, because in very rare times 
+// node.getExpression may be null.
 class CCVisitor extends ASTVisitor{
 	public int cc = 1;
 	
@@ -37,25 +39,41 @@ class CCVisitor extends ASTVisitor{
 	
 	@Override 
 	public boolean visit(CatchClause node) {
-		cc += getComplexity(node.getException().toString(), node.getNodeType());
+		try {
+			cc += getComplexity(node.getException().toString(), node.getNodeType());
+		} catch (java.lang.NullPointerException e) {
+			cc++;
+		}
 		return true;
 	}
 	
 	@Override 
 	public boolean visit(ConditionalExpression node) {
-		cc += getComplexity(node.getExpression().toString(), node.getNodeType());
+		try {
+			cc += getComplexity(node.getExpression().toString(), node.getNodeType());
+		} catch (java.lang.NullPointerException e) {
+			cc++;
+		}
 		return true;
 	}
 	
 	@Override 
 	public boolean visit(ForStatement node) {
-		cc += getComplexity(node.getExpression().toString(), node.getNodeType());
+		try {
+			cc += getComplexity(node.getExpression().toString(), node.getNodeType());
+		} catch (java.lang.NullPointerException e) {
+			cc++;
+		}
 		return true;
 	}
 	
 	@Override
 	public boolean visit(IfStatement node) {
-		cc += getComplexity(node.getExpression().toString(), node.getNodeType());
+		try {
+			cc += getComplexity(node.getExpression().toString(), node.getNodeType());
+		} catch (java.lang.NullPointerException e) {
+			cc++;
+		}
 		return true;
 	}
 	
@@ -67,7 +85,11 @@ class CCVisitor extends ASTVisitor{
 	
 	@Override 
 	public boolean visit(WhileStatement node) {
-		cc += getComplexity(node.getExpression().toString(), node.getNodeType());
+		try {
+			cc += getComplexity(node.getExpression().toString(), node.getNodeType());
+		} catch (java.lang.NullPointerException e) {
+			
+		}
 		return true;
 	}
 	
@@ -89,7 +111,6 @@ class CCVisitor extends ASTVisitor{
 				}
 			}
 		}
-
 		return cc;
 	}
 }
