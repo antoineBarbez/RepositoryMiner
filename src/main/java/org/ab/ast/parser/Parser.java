@@ -9,22 +9,23 @@ import java.util.regex.Pattern;
 
 import org.ab.ast.FileObject;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 public class Parser {
-	private String repoPath;
+	private String projectFolder;
 	private String[] sourcepathEntries;
 	
-	public Parser(String repoPath) throws IOException {
-		this.repoPath = repoPath;
-		this.sourcepathEntries = getSourcepathEntries(repoPath);
+	public Parser(String projectFolder) throws IOException {
+		this.projectFolder = projectFolder;
+		this.sourcepathEntries = getSourcepathEntries(projectFolder);
 	}
 	
 	public FileObject parseFile(File file) throws IOException {
-		String relativePath = file.getAbsolutePath().substring(repoPath.length());
+		String relativePath = file.getAbsolutePath().substring(projectFolder.length());
 				
 		ASTParser parser = ASTParser.newParser(AST.JLS10);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
@@ -45,12 +46,11 @@ public class Parser {
 	}
 	
 	public void updateSourcepathEntries() throws IOException {
-		sourcepathEntries = getSourcepathEntries(repoPath);
+		sourcepathEntries = getSourcepathEntries(projectFolder);
 	}
 	
 	
 	/**
-	 * 
 	 * @param rootDirPath the repository directory.
 	 * @return Returns all the sourcepath entries, i.e., the first parent directories of packages.
 	 * Example: if a java file: "/.../project/src/java/org/package/MyClass.java" declares "package org.package;",

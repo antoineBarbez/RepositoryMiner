@@ -1,32 +1,19 @@
-package org.ab.ast;
+package org.ab;
 
 import java.io.File;
 import java.util.Collection;
 
+import org.ab.ast.SystemObject;
 import org.ab.ast.parser.Parser;
+import org.ab.mfb.FeatureEnvyMetricFileBuilder;
+import org.ab.mfb.GodClassMetricFileBuilder;
 import org.ab.utils.GitUtils;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.lib.Repository;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
-//JUnit Suite Test
-@RunWith(Suite.class)
-
-@Suite.SuiteClasses({ 
-   ClassObjectTest.class,
-   MethodObjectTest.class
-})
-
-public class AllAstTests {
+public class MetricsExtractor {
 	
-	@BeforeClass
-    public static void setUp() throws Exception {
-		String projectDir = "/Users/antoinebarbez/Desktop/TEMP/android-platform-support";
-		String sha = "38fc0cf9d7e38258009f1a053d35827e24563de6";
-		String[] dirs = new String[] {"v4"};
-		
+	public void extractAtCommit(String projectDir, String sha, String[] dirs, String outputDir) throws Exception {
 		Repository repository = GitUtils.openRepository(projectDir);
 		GitUtils.checkout(repository, sha);
 		
@@ -37,5 +24,11 @@ public class AllAstTests {
 				SystemObject.getInstance().addFile(parser.parseFile(file));
 			}
 		}
-    }	
+		
+		GodClassMetricFileBuilder classFileBuilder = new GodClassMetricFileBuilder();
+		classFileBuilder.buildMetricFile(outputDir + "/class_metrics.csv");
+		
+		FeatureEnvyMetricFileBuilder methodFileBuilder = new FeatureEnvyMetricFileBuilder();
+		methodFileBuilder.buildMetricFile(outputDir + "/method_metrics.csv");
+	}
 }
