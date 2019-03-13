@@ -25,7 +25,7 @@ public class Parser {
 	}
 	
 	public FileObject parseFile(File file) throws IOException {
-		String relativePath = file.getAbsolutePath().substring(projectFolder.length());
+		String relativePath = file.getAbsolutePath().substring(projectFolder.length() + 1);
 				
 		ASTParser parser = ASTParser.newParser(AST.JLS10);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);

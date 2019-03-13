@@ -30,6 +30,13 @@ public class SystemObject {
 		}
 	}
 	
+	public void removeFile(String filePath) {
+		FileObject file = getFileByPath(filePath);
+		if (file != null) {
+			removeFile(file);
+		}
+	}
+	
 	public void removeFile(FileObject file) {
 		for (TopLevelClassObject c: file.getTopLevelClasses()) {
 			emptyMapsRecursively(c);
