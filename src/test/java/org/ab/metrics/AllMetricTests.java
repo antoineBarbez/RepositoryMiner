@@ -8,7 +8,6 @@ import org.ab.ast.SystemObject;
 import org.ab.ast.parser.Parser;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.Repository;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -29,8 +28,7 @@ public class AllMetricTests {
 		String sha = "38fc0cf9d7e38258009f1a053d35827e24563de6";
 		String[] dirs = new String[] {"v4"};
 		
-		Repository repository = RepositoryMiner.openRepository(projectDir);
-		try (Git git = new Git(repository)) {
+		try (Git git = RepositoryMiner.openRepository(projectDir)) {
 			git.checkout().setName(sha).call();
 			
 			Parser parser = new Parser(projectDir);

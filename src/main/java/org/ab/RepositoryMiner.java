@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 
@@ -25,13 +26,13 @@ public class RepositoryMiner {
 	private static void mineAtCommit(String projectDir, String sha, String[] dirsToAnalyze, String outputDir) throws Exception {
 		String normalizedOutputDir = FilenameUtils.normalizeNoEndSeparator(outputDir);
 		
-		try (Repository repository = openRepository(projectDir)) {
-			MetricsExtractor metricsExtractor = new MetricsExtractor(repository);
+		try (Git git = openRepository(projectDir)) {
+			MetricsExtractor metricsExtractor = new MetricsExtractor(git);
 			metricsExtractor.extractFromCommit(sha, dirsToAnalyze, normalizedOutputDir);
 		}
 	}
 	
-	public static Repository openRepository(String projectDir) throws Exception {
+	public static Git openRepository(String projectDir) throws Exception {
 	    File folder = new File(projectDir);
 	    Repository repository;
 	    if (folder.exists()) {
@@ -44,6 +45,6 @@ public class RepositoryMiner {
 	    } else {
 	        throw new FileNotFoundException(projectDir);
 	    }
-	    return repository;
+	    return new Git(repository);
 	}
 }

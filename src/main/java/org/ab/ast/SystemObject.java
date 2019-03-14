@@ -30,14 +30,24 @@ public class SystemObject {
 		}
 	}
 	
-	public void removeFile(String filePath) {
+	/**
+	 * Removes a file in the system as well as all CodeComponents declared in this file,
+	 * e.g., classes, methods and attributes.
+	 * @param filePath the relative path of the file to be removed.
+	 * @return true if a file has actually been removed from the system and false otherwise,
+	 * i.e., the system did not contain a file with the given path.
+	 */
+	public boolean removeFile(String filePath) {
 		FileObject file = getFileByPath(filePath);
-		if (file != null) {
-			removeFile(file);
+		if (file == null) {
+			return false;
 		}
+		
+		removeFile(file);
+		return true;
 	}
 	
-	public void removeFile(FileObject file) {
+	private void removeFile(FileObject file) {
 		for (TopLevelClassObject c: file.getTopLevelClasses()) {
 			emptyMapsRecursively(c);
 		}
