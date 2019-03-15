@@ -45,6 +45,10 @@ public class Parser {
 		return visitor.getFileObject();
 	}
 	
+	public void updateSourcepathEntries() throws IOException {
+		this.sourcepathEntries = getSourcepathEntries(projectFolder);
+	}
+	
 	/**
 	 * @param rootDirPath the repository directory.
 	 * @return Returns all the sourcepath entries, i.e., the first parent directories of packages.

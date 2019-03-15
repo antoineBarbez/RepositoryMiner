@@ -1,11 +1,11 @@
 package org.ab.mfb;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import org.ab.ast.ClassObject;
 import org.ab.ast.FileObject;
 import org.ab.ast.SystemObject;
 import org.ab.ast.TopLevelClassObject;
@@ -17,53 +17,58 @@ import org.ab.metrics.NADC;
 import org.ab.metrics.NMD;
 import org.ab.metrics.WMC;
 
-public class GodClassMetricFileBuilder implements IMetricFileBuilder {
+public class GodClassMetricFileBuilder extends MetricFileBuilder {
 	
 	@Override
-	public boolean buildMetricFile(String filePath) throws FileNotFoundException {
-		PrintWriter out = new PrintWriter(filePath);
-		
-		String header = "Class;LOC;NMD;NAD;LCOM5;NADC;ATFD;WMC";
-		out.println(header);
-
-		Iterator<String> iter = getLines().iterator();
-		while (iter.hasNext()) {
-			String csvLine = iter.next();
-			if (csvLine != null) {
-				out.println(csvLine);
-			}
-		}
-		out.close();
-		
-		return true;
-	}
-	
-	private List<String> getLines() {
+	public List<String> getEntities() {
 		SystemObject s = SystemObject.getInstance();
 		
-		List<String> lines = new ArrayList<String>();
+		List<String> entities = new ArrayList<String>();
 		for (FileObject f: s.getFiles()) {
 			for (TopLevelClassObject c : f.getTopLevelClasses()) {
-				StringBuffer lineBuffer = new StringBuffer();
-				lineBuffer.append(c.getName());
-				lineBuffer.append(";");
-				lineBuffer.append(String.valueOf(LOC.compute(c)));
-				lineBuffer.append(";");
-				lineBuffer.append(String.valueOf(NMD.compute(c)));
-				lineBuffer.append(";");
-				lineBuffer.append(String.valueOf(NAD.compute(c)));
-				lineBuffer.append(";");
-				lineBuffer.append(String.valueOf(LCOM5.compute(c)));
-				lineBuffer.append(";");
-				lineBuffer.append(String.valueOf(NADC.compute(c)));
-				lineBuffer.append(";");
-				lineBuffer.append(String.valueOf(ATFD.compute(c)));
-				lineBuffer.append(";");
-				lineBuffer.append(String.valueOf(WMC.compute(c)));
-				lines.add(lineBuffer.toString());
+				entities.add(c.getName());
 			}
 		}
+		return entities;
+	}
+	
+	@Override
+	public String getHeader() {
+		return "Class;LOC;NMD;NAD;LCOM5;NADC;ATFD;WMC";
+	}
+	
+	@Override
+	public List<String> getMetricValues(String entity) {
+		ClassObject c = SystemObject.getInstance().getClassByName(entity);
 		
-		return lines;
+		if (c == null) {
+			return Arrays.asList("0", "0", "0", "0", "0", "0", "0");
+		}
+		
+		List<String> metricValues = new ArrayList<String>();
+		metricValues.add(String.valueOf(LOC.compute(c)));
+		metricValues.add(String.valueOf(NMD.compute(c)));
+		metricValues.add(String.valueOf(NAD.compute(c)));
+		metricValues.add(String.valueOf(LCOM5.compute(c)));
+		metricValues.add(String.valueOf(NADC.compute(c)));
+		metricValues.add(String.valueOf(ATFD.compute(c)));
+		metricValues.add(String.valueOf(WMC.compute(c)));
+		return metricValues;
+	}
+
+	@Override
+	public void handleRenamedComponents(Map<String, String> renamedClasses, Map<String, String> renamedMethods) {
+		for (Map.Entry<String, String> entry_e : currentNames.entrySet()) {
+			String initialName = entry_e.getKey();
+			String currentName = entry_e.getValue();
+			
+			for (Map.Entry<String, String> entry_c : renamedClasses.entrySet()) {
+				String oldClassName = entry_c.getKey();
+				String newClassName = entry_c.getValue();
+				if (initialName.equals(oldClassName) || currentName.equals(oldClassName)) {
+					currentNames.put(initialName, newClassName);
+				}
+			}
+		}
 	}
 }

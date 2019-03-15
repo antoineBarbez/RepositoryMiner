@@ -3,6 +3,7 @@ package org.ab;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import org.ab.mfb.FeatureEnvyMetricFileBuilder;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
@@ -15,19 +16,19 @@ public class RepositoryMiner {
 		}
 		
 		if (args.length == 3) {
-			mineAtCommit(args[0], args[1], new String[]{""}, args[2]);
+			mineFromCommit(args[0], args[1], new String[]{""}, args[2]);
 		}
 		
 		if (args.length == 4) {
-			mineAtCommit(args[0], args[1], args[2].split("@", -1), args[3]);
+			mineFromCommit(args[0], args[1], args[2].split("@", -1), args[3]);
 		}
 	}
 	
-	private static void mineAtCommit(String projectDir, String sha, String[] dirsToAnalyze, String outputDir) throws Exception {
+	private static void mineFromCommit(String projectDir, String sha, String[] dirsToAnalyze, String outputDir) throws Exception {
 		String normalizedOutputDir = FilenameUtils.normalizeNoEndSeparator(outputDir);
 		
 		try (Git git = openRepository(projectDir)) {
-			MetricsExtractor metricsExtractor = new MetricsExtractor(git);
+			MetricsExtractor metricsExtractor = new MetricsExtractor(git, new FeatureEnvyMetricFileBuilder());
 			metricsExtractor.extractFromCommit(sha, dirsToAnalyze, normalizedOutputDir);
 		}
 	}

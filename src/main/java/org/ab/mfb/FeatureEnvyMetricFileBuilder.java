@@ -1,11 +1,10 @@
 package org.ab.mfb;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.ab.ast.ClassObject;
@@ -20,31 +19,13 @@ import org.ab.metrics.NAD;
 import org.ab.metrics.NIM;
 import org.ab.metrics.NMD;
 
-public class FeatureEnvyMetricFileBuilder implements IMetricFileBuilder {
-	
-	@Override
-	public boolean buildMetricFile(String filePath) throws FileNotFoundException {
-		PrintWriter out = new PrintWriter(filePath);
-		
-		String header = "Method;Class;FDP;NIM_D;NAA_D;DISTANCE_D;LOC_D;NMD_D;NAD_D;NIM_E;NAA_E;DISTANCE_E;LOC_E;NMD_E;NAD_E";
-		out.println(header);
+public class FeatureEnvyMetricFileBuilder extends MetricFileBuilder {
 
-		Iterator<String> iter = getLines().iterator();
-		while (iter.hasNext()) {
-			String csvLine = iter.next();
-			if (csvLine != null) {
-				out.println(csvLine);
-			}
-		}
-		out.close();
-		
-		return true;
-	}
-	
-	private List<String> getLines() {
+	@Override
+	public List<String> getEntities() {
 		SystemObject s = SystemObject.getInstance();
 		
-		List<String> lines = new ArrayList<String>();
+		List<String> entities = new ArrayList<String>();
 		for (MethodObject m: s.getMethods()) {
 			if (!m.getModifiers().contains("static") && !m.isAccessor()) {
 				Set<ClassObject> accessedClasses = new HashSet<ClassObject>();
@@ -63,51 +44,78 @@ public class FeatureEnvyMetricFileBuilder implements IMetricFileBuilder {
 				}
 				
 				if (accessedClasses.size() != 0) {
-					String fdp = String.valueOf(FDP.compute(m));
-					String nim_d = String.valueOf(NIM.compute(m, m.getDeclaringClass()));
-					String naa_d = String.valueOf(NAA.compute(m, m.getDeclaringClass()));
-					String distance_d = String.valueOf(DISTANCE.compute(m, m.getDeclaringClass()));
-					String loc_d = String.valueOf(LOC.compute(m.getDeclaringClass()));
-					String nmd_d = String.valueOf(NMD.compute(m.getDeclaringClass()));
-					String nad_d = String.valueOf(NAD.compute(m.getDeclaringClass()));
-					
 					for (ClassObject accessedClass: accessedClasses) {
 						StringBuffer lineBuffer = new StringBuffer();
 						lineBuffer.append(m.getName());
 						lineBuffer.append(";");
 						lineBuffer.append(accessedClass.getName());
-						lineBuffer.append(";");
-						lineBuffer.append(fdp);
-						lineBuffer.append(";");
-						lineBuffer.append(nim_d);
-						lineBuffer.append(";");
-						lineBuffer.append(naa_d);
-						lineBuffer.append(";");
-						lineBuffer.append(distance_d);
-						lineBuffer.append(";");
-						lineBuffer.append(loc_d);
-						lineBuffer.append(";");
-						lineBuffer.append(nmd_d);
-						lineBuffer.append(";");
-						lineBuffer.append(nad_d);
-						lineBuffer.append(";");
-						lineBuffer.append(String.valueOf(NIM.compute(m, accessedClass)));
-						lineBuffer.append(";");
-						lineBuffer.append(String.valueOf(NAA.compute(m, accessedClass)));
-						lineBuffer.append(";");
-						lineBuffer.append(String.valueOf(DISTANCE.compute(m, accessedClass)));
-						lineBuffer.append(";");
-						lineBuffer.append(String.valueOf(LOC.compute(accessedClass)));
-						lineBuffer.append(";");
-						lineBuffer.append(String.valueOf(NMD.compute(accessedClass)));
-						lineBuffer.append(";");
-						lineBuffer.append(String.valueOf(NAD.compute(accessedClass)));
-						lines.add(lineBuffer.toString());
+						entities.add(lineBuffer.toString());
 					}	
 				}
 			}
 		}
+		return entities;
+	}
+
+	@Override
+	public String getHeader() {
+		return "Method;Class;FDP;NIM_D;NAA_D;DISTANCE_D;LOC_D;NMD_D;NAD_D;NIM_E;NAA_E;DISTANCE_E;LOC_E;NMD_E;NAD_E";
+	}
+
+	@Override
+	public List<String> getMetricValues(String entity) {
+		String methodName = entity.split(";")[0];
+		String className = entity.split(";")[1];
 		
-		return lines;
+		MethodObject method = SystemObject.getInstance().getMethodByName(methodName);
+		ClassObject enviedClass = SystemObject.getInstance().getClassByName(className);
+		
+		if (method == null || enviedClass == null) {
+			return Arrays.asList("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
+		}
+		
+		ClassObject declaringClass = method.getDeclaringClass();
+		
+		List<String> metricValues = new ArrayList<String>();
+		metricValues.add(String.valueOf(FDP.compute(method)));
+		metricValues.add(String.valueOf(NIM.compute(method, declaringClass)));
+		metricValues.add(String.valueOf(NAA.compute(method, declaringClass)));
+		metricValues.add(String.valueOf(DISTANCE.compute(method, declaringClass)));
+		metricValues.add(String.valueOf(LOC.compute(declaringClass)));
+		metricValues.add(String.valueOf(NMD.compute(declaringClass)));
+		metricValues.add(String.valueOf(NAD.compute(declaringClass)));
+		metricValues.add(String.valueOf(NIM.compute(method, enviedClass)));
+		metricValues.add(String.valueOf(NAA.compute(method, enviedClass)));
+		metricValues.add(String.valueOf(DISTANCE.compute(method, enviedClass)));
+		metricValues.add(String.valueOf(LOC.compute(enviedClass)));
+		metricValues.add(String.valueOf(NMD.compute(enviedClass)));
+		metricValues.add(String.valueOf(NAD.compute(enviedClass)));
+		return metricValues;
+	}
+	
+	@Override
+	public void handleRenamedComponents(Map<String, String> renamedClasses, Map<String, String> renamedMethods) {
+		for (Map.Entry<String, String> entry_e : currentNames.entrySet()) {
+			String initialName = entry_e.getKey();
+			String currentName = entry_e.getValue();
+			
+			for (Map.Entry<String, String> entry_c : renamedClasses.entrySet()) {
+				String oldClassName = entry_c.getKey();
+				String newClassName = entry_c.getValue();
+				if (initialName.endsWith(";" + oldClassName) || currentName.endsWith(";" + oldClassName)) {
+					String currentMethodName = currentName.split(";")[0];
+					currentNames.put(initialName, currentMethodName + ";" + newClassName);
+				}
+			}
+			
+			for (Map.Entry<String, String> entry_m : renamedMethods.entrySet()) {
+				String oldMethodName = entry_m.getKey();
+				String newMethodName = entry_m.getValue();
+				if (initialName.startsWith(oldMethodName + ";") || currentName.startsWith(oldMethodName + ";")) {
+					String currentClassName = currentName.split(";")[1];
+					currentNames.put(initialName, newMethodName + ";" + currentClassName);
+				}
+			}
+		}
 	}
 }

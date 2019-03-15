@@ -22,6 +22,10 @@ public class SystemObject {
 		return INSTANCE;
 	}
 	
+	/**
+	 * Add a new file to the system. 
+	 * @param file the new FileObject to be added.
+	 */
 	public void addFile(FileObject file) {
 		files.add(file);
 		fileMap.put(file.getPath(), file);
@@ -30,24 +34,7 @@ public class SystemObject {
 		}
 	}
 	
-	/**
-	 * Removes a file in the system as well as all CodeComponents declared in this file,
-	 * e.g., classes, methods and attributes.
-	 * @param filePath the relative path of the file to be removed.
-	 * @return true if a file has actually been removed from the system and false otherwise,
-	 * i.e., the system did not contain a file with the given path.
-	 */
-	public boolean removeFile(String filePath) {
-		FileObject file = getFileByPath(filePath);
-		if (file == null) {
-			return false;
-		}
-		
-		removeFile(file);
-		return true;
-	}
-	
-	private void removeFile(FileObject file) {
+	public void removeFile(FileObject file) {
 		for (TopLevelClassObject c: file.getTopLevelClasses()) {
 			emptyMapsRecursively(c);
 		}
@@ -124,6 +111,4 @@ public class SystemObject {
 		}
 		return null;
 	}
-	
-	
 }
