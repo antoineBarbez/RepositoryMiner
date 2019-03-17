@@ -8,11 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class MetricFileBuilder {
-	public Map<String, String> currentNames = null;
+	public Map<String, String> currentNames = new HashMap<String, String>();
 	
 	public boolean buildMetricFile(String filePath) throws FileNotFoundException {
-		if (currentNames == null) {
-			currentNames = new HashMap<String, String>();
+		if (currentNames.isEmpty()) {
 			for (String entityName : getEntities()) {
 				currentNames.put(entityName, entityName);
 			}

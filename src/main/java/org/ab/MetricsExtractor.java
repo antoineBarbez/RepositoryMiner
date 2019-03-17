@@ -3,19 +3,10 @@ package org.ab;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
-import org.ab.ast.ClassObject;
-import org.ab.ast.CodeComponent;
 import org.ab.ast.FileObject;
-import org.ab.ast.InnerClassObject;
-import org.ab.ast.MethodObject;
 import org.ab.ast.SystemObject;
-import org.ab.ast.TopLevelClassObject;
 import org.ab.ast.parser.Parser;
 import org.ab.mfb.MetricFileBuilder;
 import org.apache.commons.io.FileUtils;
@@ -33,12 +24,14 @@ public class MetricsExtractor {
 	private MetricFileBuilder mfb;
 	private Parser parser;
 	private String projectDir;
+	private RenamedComponentsDetector rcd;
 	
 	public MetricsExtractor(Git git, MetricFileBuilder mfb) throws IOException {
 		this.git = git;
 		this.mfb = mfb;
 		this.projectDir = git.getRepository().getDirectory().getParentFile().getAbsolutePath();
 		this.parser = new Parser(this.projectDir);
+		this.rcd = new RenamedComponentsDetector();
 	}
 	
 	public void extractAtCommit(String sha, String[] dirs, String outputDir) throws Exception {
@@ -64,10 +57,12 @@ public class MetricsExtractor {
 			
 			if (changed) {
 				// Extract metrics
+				mfb.handleRenamedComponents(rcd.getRenamedClasses(), rcd.getRenamedMethods());
 				mfb.buildMetricFile(outputDir + "/commit_" + String.valueOf(count) + ".csv");
 				
 				count ++;
 				changed = false;
+				rcd.clear();
 			}
 			
 			// Update the system if necessary
@@ -131,7 +126,7 @@ public class MetricsExtractor {
 								checkout(previousCommit.name());
 							}
 							FileObject previousFile = parser.parseFile(new File(projectDir + "/" + previousPath));
-							checkForRenamedComponents(currentFile, previousFile);
+							rcd.detectRenamedComponents(currentFile, previousFile);
 							SystemObject.getInstance().removeFile(currentFile);
 							SystemObject.getInstance().addFile(previousFile);
 							changed = true;
@@ -143,129 +138,4 @@ public class MetricsExtractor {
 		}
 		return changed;
 	}
-	
-	private void checkForRenamedComponents(FileObject initialFile, FileObject finalFile) {
-		Map<String, String> renamedClasses = new HashMap<String, String>();
-		Map<String, String> renamedMethods = new HashMap<String, String>();
-		
-		// Process top-level classes
-		Set<TopLevelClassObject> initialTopLevelClasses = new HashSet<TopLevelClassObject>(initialFile.getTopLevelClasses());
-		Set<TopLevelClassObject> finalTopLevelClasses = new HashSet<TopLevelClassObject>(finalFile.getTopLevelClasses());
-		
-		for (TopLevelClassObject ic : initialFile.getTopLevelClasses()) {
-			TopLevelClassObject homonymClass;
-			if ((homonymClass = (TopLevelClassObject)findComponentWithSameIdentifier(ic, finalTopLevelClasses)) != null) {
-				if (!ic.getName().equals(homonymClass.getName())) {
-					renamedClasses.put(ic.getName(), homonymClass.getName());
-				}
-				checkForRenamedComponents(ic, homonymClass, renamedClasses, renamedMethods);
-				initialTopLevelClasses.remove(ic);
-				finalTopLevelClasses.remove(homonymClass);
-			}
-		}
-		
-		// Check for similarity between remaining classes
-		for (TopLevelClassObject ic : initialTopLevelClasses) {
-			TopLevelClassObject similarClass;
-			if ((similarClass = (TopLevelClassObject)findSimilarClass(ic, finalTopLevelClasses)) != null) {
-				renamedClasses.put(ic.getName(), similarClass.getName());
-				checkForRenamedComponents(ic, similarClass, renamedClasses, renamedMethods);
-				finalTopLevelClasses.remove(similarClass);
-			}
-		}
-		
-		mfb.handleRenamedComponents(renamedClasses, renamedMethods);
-		
-	}
-	
-	private void checkForRenamedComponents(ClassObject initialClass, ClassObject finalClass, Map<String, String> renamedClasses, Map<String, String> renamedMethods) {
-		// Process inner classes
-		Set<InnerClassObject> initialInnerClasses = new HashSet<InnerClassObject>(initialClass.getInnerClasses());
-		Set<InnerClassObject> finalInnerClasses = new HashSet<InnerClassObject>(finalClass.getInnerClasses());
-		
-		for (InnerClassObject ic : initialClass.getInnerClasses()) {
-			InnerClassObject homonymClass;
-			if ((homonymClass = (InnerClassObject)findComponentWithSameIdentifier(ic, finalInnerClasses)) != null) {
-				if (!ic.getName().equals(homonymClass.getName())) {
-					renamedClasses.put(ic.getName(), homonymClass.getName());
-				}
-				checkForRenamedComponents(ic, homonymClass, renamedClasses, renamedMethods);
-				initialInnerClasses.remove(ic);
-				finalInnerClasses.remove(homonymClass);
-			}
-		}
-		
-		// Check for similarity between remaining classes
-		for (InnerClassObject ic: initialInnerClasses) {
-			InnerClassObject similarClass;
-			if ((similarClass = (InnerClassObject)findSimilarClass(ic, finalInnerClasses)) != null) {
-				renamedClasses.put(ic.getName(), similarClass.getName());
-				checkForRenamedComponents(ic, similarClass, renamedClasses, renamedMethods);
-				finalInnerClasses.remove(similarClass);
-			}
-		}
-		
-		// Process methods
-		Set<MethodObject> initialMethods = new HashSet<MethodObject>(initialClass.getMethods());
-		Set<MethodObject> finalMethods = new HashSet<MethodObject>(finalClass.getMethods());
-		
-		for (MethodObject im : initialClass.getMethods()) {
-			MethodObject homonymMethod;
-			if ((homonymMethod = (MethodObject)findComponentWithSameIdentifier(im, finalMethods)) !=null) {
-				if (!im.getName().equals(homonymMethod.getName())) {
-					renamedMethods.put(im.getName(), homonymMethod.getName());
-				}
-				initialMethods.remove(im);
-				finalMethods.remove(homonymMethod);
-			}
-		}
-		
-		// Check for similarity between remaining methods
-		for (MethodObject im : initialMethods) {
-			MethodObject similarMethod;
-			if ((similarMethod = findSimilarMethod(im, finalMethods)) != null) {
-				renamedMethods.put(im.getName(), similarMethod.getName());
-				finalMethods.remove(similarMethod);
-			}
-		}	
-	}
-	
-	private CodeComponent findComponentWithSameIdentifier(CodeComponent cc, Set<? extends CodeComponent> ccs) {
-		String identifier = cc.getIdentifier();
-		for (CodeComponent cci : ccs) {
-			if (cci.getIdentifier().equals(identifier)) {
-				return cci;
-			}
-		}
-		return null;
-	}
-	
-	private MethodObject findSimilarMethod(MethodObject m, Set<MethodObject> ms) {
-		for (MethodObject mi : ms) {
-			if (compare(m, mi)) {
-				return mi;
-			}
-		}
-		return null;
-	}
-	
-	private ClassObject findSimilarClass(ClassObject c, Set<? extends ClassObject> cs) {
-		for (ClassObject ci : cs) {
-			if (compare(c, ci)) {
-				return ci;
-			}
-		}
-		return null;
-	}
-	
-	private boolean compare(ClassObject c1, ClassObject c2) {
-		// TODO
-		return false;
-	}
-	
-	private boolean compare(MethodObject m1, MethodObject m2) {
-		// TODO
-		return false;
-	}
-	
 }
