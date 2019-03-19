@@ -109,6 +109,10 @@ public class ClassVisitor extends ASTVisitor {
 			params.add(svd.getType().toString());
 		}
 		
+		if (node.getReturnType2() != null) {
+			method.setReturnType(node.getReturnType2().toString());
+		}
+		
 		method.setBody(node.getBody());
 		method.setConstructor(node.isConstructor());
 		method.setModifiers(modifiers);

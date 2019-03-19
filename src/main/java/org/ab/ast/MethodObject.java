@@ -14,9 +14,10 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 public class MethodObject extends CodeComponent {
-	private boolean constructor = false;
 	private Block body = null;
+	private boolean constructor = false;
 	private ClassObject declaringClass = null;
+	private String returnType = null;
 	private List<String> parameters = new ArrayList<String>();
 	private Set<String> accessedFields = new HashSet<String>();
 	private Set<String> invokedMethods = new HashSet<String>();
@@ -64,6 +65,10 @@ public class MethodObject extends CodeComponent {
 		return parameters;
 	}
 	
+	public String getReturnType() {
+		return returnType;
+	}
+	
 	public boolean isAccessor() {
 		return (isGetter() || isSetter());
 	}
@@ -72,7 +77,7 @@ public class MethodObject extends CodeComponent {
 		return constructor;
 	}
 	
-	private boolean isGetter() {
+	public boolean isGetter() {
     	if(body != null) {
 	    	if(body.statements().size() == 1) {
 	    		Statement statement = (Statement)body.statements().get(0);
@@ -88,7 +93,7 @@ public class MethodObject extends CodeComponent {
     	return false;
     }
 	
-	private boolean isSetter() {
+	public boolean isSetter() {
     	if(body != null) {
 	    	if(body.statements().size() == 1) {
 	    		Statement statement = (Statement)body.statements().get(0);
@@ -120,5 +125,9 @@ public class MethodObject extends CodeComponent {
 	
 	public void setParameters(List<String> parameters) {
 		this.parameters = parameters;
+	}
+	
+	public void setReturnType(String returnType) {
+		this.returnType = returnType;
 	}
 }

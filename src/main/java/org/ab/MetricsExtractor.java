@@ -38,7 +38,7 @@ public class MetricsExtractor {
 		populateSystem(sha, dirs);
 		
 		// Extract metrics
-		mfb.buildMetricFile(outputDir + "metrics.csv");
+		//mfb.buildMetricFile(outputDir + "metrics.csv");
 	}
 	
 	public void extractFromCommit(String sha, String[] dirs, String outputDir) throws Exception {

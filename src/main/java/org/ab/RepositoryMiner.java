@@ -2,9 +2,18 @@ package org.ab;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.ab.ast.MethodObject;
+import org.ab.ast.SystemObject;
 import org.ab.mfb.FeatureEnvyMetricFileBuilder;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
