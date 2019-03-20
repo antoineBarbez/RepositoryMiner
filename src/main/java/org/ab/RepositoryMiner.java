@@ -8,10 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.ab.ast.MethodObject;
 import org.ab.ast.SystemObject;
 import org.ab.mfb.FeatureEnvyMetricFileBuilder;
+import org.ab.mfb.GodClassMetricFileBuilder;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.eclipse.jgit.api.Git;
@@ -37,7 +39,7 @@ public class RepositoryMiner {
 		String normalizedOutputDir = FilenameUtils.normalizeNoEndSeparator(outputDir);
 		
 		try (Git git = openRepository(projectDir)) {
-			MetricsExtractor metricsExtractor = new MetricsExtractor(git, new FeatureEnvyMetricFileBuilder());
+			MetricsExtractor metricsExtractor = new MetricsExtractor(git, new GodClassMetricFileBuilder());
 			metricsExtractor.extractFromCommit(sha, dirsToAnalyze, normalizedOutputDir);
 		}
 	}

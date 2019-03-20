@@ -8,7 +8,7 @@ import org.ab.ast.MethodObject;
 
 /*
  * NMD: Number of Methods Declared.
- * Counts only non-accessor methods.
+ * Counts only non constructor and non accessor methods.
  */
 
 public class NMD {
@@ -16,7 +16,7 @@ public class NMD {
 	public static int compute(ClassObject c) {
 		Set<String> nam = new HashSet<String>();
 		for (MethodObject m: c.getMethods()) {
-			if (!m.isAccessor()) {
+			if (!m.isConstructor() && !m.isAccessor()) {
 				nam.add(m.getName());
 			}
 		}

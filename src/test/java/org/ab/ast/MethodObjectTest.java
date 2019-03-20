@@ -56,7 +56,7 @@ public class MethodObjectTest {
 		assertEquals(2, m1.getInvokedMethods().size());
 		assertEquals(3, m2.getInvokedMethods().size());
 		assertEquals(1, m3.getInvokedMethods().size());
-		assertEquals(8, m4.getInvokedMethods().size());
+		assertEquals(3, m4.getInvokedMethods().size());
 		assertEquals(2, m5.getInvokedMethods().size());
 	}
 	

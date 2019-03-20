@@ -28,7 +28,7 @@ public class CYCLO {
 	}
 }
 
-// Must try/catch when visiting nodes' expressions, because in very rare times 
+// Must try/catch when visiting nodes' expressions, because in very rare cases 
 // node.getExpression may be null.
 class CCVisitor extends ASTVisitor{
 	public int cc = 1;

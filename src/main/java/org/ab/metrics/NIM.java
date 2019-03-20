@@ -9,7 +9,7 @@ import org.ab.ast.SystemObject;
 
 /*
  * NIM: Number of Invoked Methods.
- * Number of distinct non-accessor methods of a class invoked by a method.
+ * Number of distinct non constructor and non accessor methods of a class invoked by a method.
  */
 
 public class NIM {
@@ -21,7 +21,7 @@ public class NIM {
 		
 		for (String invokedMethodName: m.getInvokedMethods()) {
 			MethodObject invokedMethod = s.getMethodByName(invokedMethodName);
-			if (invokedMethod != null && !invokedMethod.isAccessor() && invokedMethod.getDeclaringClass().getName().equals(c.getName())) {
+			if (invokedMethod != null && !invokedMethod.isConstructor() && !invokedMethod.isAccessor() && invokedMethod.getDeclaringClass().getName().equals(c.getName())) {
 				invokedMethods.add(invokedMethodName);
 			}
 		}
