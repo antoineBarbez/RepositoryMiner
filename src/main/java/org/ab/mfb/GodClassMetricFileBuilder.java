@@ -3,6 +3,7 @@ package org.ab.mfb;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.ab.ast.ClassObject;
@@ -49,7 +50,7 @@ public class GodClassMetricFileBuilder extends MetricFileBuilder {
 		metricValues.add(String.valueOf(LOC.compute(c)));
 		metricValues.add(String.valueOf(NMD.compute(c)));
 		metricValues.add(String.valueOf(NAD.compute(c)));
-		metricValues.add(String.valueOf(LCOM5.compute(c)));
+		metricValues.add(String.format(Locale.US, "%.4f", LCOM5.compute(c)));
 		metricValues.add(String.valueOf(NADC.compute(c)));
 		metricValues.add(String.valueOf(ATFD.compute(c)));
 		metricValues.add(String.valueOf(WMC.compute(c)));

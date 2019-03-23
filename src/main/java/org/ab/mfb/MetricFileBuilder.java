@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class MetricFileBuilder {
+	private String previousFileContent = null;
 	public Map<String, String> currentNames = new HashMap<String, String>();
 	
 	public boolean buildMetricFile(String filePath) throws FileNotFoundException {
@@ -16,29 +17,37 @@ public abstract class MetricFileBuilder {
 				currentNames.put(entityName, entityName);
 			}
 		}
-		
-		try (PrintWriter out = new PrintWriter(filePath)) {
-			out.println(getHeader());
-
-			Iterator<String> iteratorOnEntities = currentNames.keySet().iterator();
-			while (iteratorOnEntities.hasNext()) {
-				String entityName = iteratorOnEntities.next();
-				String currentEntityName = currentNames.get(entityName);
-				
-				StringBuffer lineBuffer = new StringBuffer();
-				lineBuffer.append(entityName);
-				lineBuffer.append(";");
-				Iterator<String> iteratorOnValues = getMetricValues(currentEntityName).iterator();
-				while (iteratorOnValues.hasNext()) {
-					lineBuffer.append(iteratorOnValues.next());
-					if (iteratorOnValues.hasNext()) {
-						lineBuffer.append(";");
-					}
+			
+		StringBuffer fileBuffer = new StringBuffer();
+		Iterator<String> iteratorOnEntities = currentNames.keySet().iterator();
+		while (iteratorOnEntities.hasNext()) {
+			String entityName = iteratorOnEntities.next();
+			String currentEntityName = currentNames.get(entityName);
+			
+			StringBuffer lineBuffer = new StringBuffer();
+			lineBuffer.append(entityName);
+			lineBuffer.append(";");
+			Iterator<String> iteratorOnValues = getMetricValues(currentEntityName).iterator();
+			while (iteratorOnValues.hasNext()) {
+				lineBuffer.append(iteratorOnValues.next());
+				if (iteratorOnValues.hasNext()) {
+					lineBuffer.append(";");
 				}
-				out.println(lineBuffer.toString());
+			}
+			
+			fileBuffer.append(lineBuffer.toString());
+			fileBuffer.append("\n");
+		}
+		
+		if (!fileBuffer.toString().equals(previousFileContent)) {
+			try (PrintWriter out = new PrintWriter(filePath)) {
+				out.println(getHeader());
+				out.print(fileBuffer.toString());
+				previousFileContent = fileBuffer.toString();
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 	
 	public abstract List<String> getEntities();

@@ -20,13 +20,17 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 public class MetricsExtractor {
+	private final int MAX_HISTORY_LENGTH;
+	
 	private Git git;
 	private MetricFileBuilder mfb;
 	private Parser parser;
 	private String projectDir;
 	private RenamedComponentsDetector rcd;
 	
-	public MetricsExtractor(Git git, MetricFileBuilder mfb) throws IOException {
+	public MetricsExtractor(Git git, MetricFileBuilder mfb, int max) throws IOException {
+		this.MAX_HISTORY_LENGTH = max;
+		
 		this.git = git;
 		this.mfb = mfb;
 		this.projectDir = git.getRepository().getDirectory().getParentFile().getAbsolutePath();
@@ -38,7 +42,7 @@ public class MetricsExtractor {
 		populateSystem(sha, dirs);
 		
 		// Extract metrics
-		mfb.buildMetricFile(outputDir + "metrics.csv");
+		mfb.buildMetricFile(outputDir + "metrics_gc.csv");
 	}
 	
 	public void extractFromCommit(String sha, String[] dirs, String outputDir) throws Exception {
@@ -52,15 +56,15 @@ public class MetricsExtractor {
         boolean changed = true;
         RevCommit currentCommit = iteratorOnCommits.next();
         System.out.println("Start mining history ...");
-        while(iteratorOnCommits.hasNext()) {
+        while(count < MAX_HISTORY_LENGTH && iteratorOnCommits.hasNext()) {
 			RevCommit previousCommit = iteratorOnCommits.next();
 			
 			if (changed) {
 				// Extract metrics
 				mfb.handleRenamedComponents(rcd.getRenamedClasses(), rcd.getRenamedMethods());
-				mfb.buildMetricFile(outputDir + "/commit_" + String.valueOf(count) + ".csv");
 				
-				count ++;
+				String metricFilePath = outputDir + String.format("/commit_%d.csv", count); 
+				count = mfb.buildMetricFile(metricFilePath) == true ? count+1 : count;
 				changed = false;
 				rcd.clear();
 			}

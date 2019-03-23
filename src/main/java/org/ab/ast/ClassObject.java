@@ -84,7 +84,7 @@ public abstract class ClassObject extends CodeComponent {
 		nbMethods = Integer.max(1, nbMethods);
 		
 		double ratio = nbFields/nbMethods;
-		if (ratio >= 7) {
+		if (ratio >= 6) {
 			return true;
 		}
 		return false;

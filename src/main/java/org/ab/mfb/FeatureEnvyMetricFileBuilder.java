@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,7 +28,7 @@ public class FeatureEnvyMetricFileBuilder extends MetricFileBuilder {
 		
 		List<String> entities = new ArrayList<String>();
 		for (MethodObject m: s.getMethods()) {
-			if (!m.getModifiers().contains("static") && !m.isAccessor()) {
+			if (!m.getModifiers().contains("static") && !m.isAccessor() && !m.isConstructor()) {
 				Set<ClassObject> accessedClasses = new HashSet<ClassObject>();
 				for (String accessedFieldName: m.getAccessedFields()) {
 					FieldObject accessedField = s.getFieldByName(accessedFieldName);
@@ -80,13 +81,13 @@ public class FeatureEnvyMetricFileBuilder extends MetricFileBuilder {
 		metricValues.add(String.valueOf(FDP.compute(method)));
 		metricValues.add(String.valueOf(NIM.compute(method, declaringClass)));
 		metricValues.add(String.valueOf(NAA.compute(method, declaringClass)));
-		metricValues.add(String.valueOf(DISTANCE.compute(method, declaringClass)));
+		metricValues.add(String.format(Locale.US, "%.4f", DISTANCE.compute(method, declaringClass)));
 		metricValues.add(String.valueOf(LOC.compute(declaringClass)));
 		metricValues.add(String.valueOf(NMD.compute(declaringClass)));
 		metricValues.add(String.valueOf(NAD.compute(declaringClass)));
 		metricValues.add(String.valueOf(NIM.compute(method, enviedClass)));
 		metricValues.add(String.valueOf(NAA.compute(method, enviedClass)));
-		metricValues.add(String.valueOf(DISTANCE.compute(method, enviedClass)));
+		metricValues.add(String.format(Locale.US, "%.4f", DISTANCE.compute(method, enviedClass)));
 		metricValues.add(String.valueOf(LOC.compute(enviedClass)));
 		metricValues.add(String.valueOf(NMD.compute(enviedClass)));
 		metricValues.add(String.valueOf(NAD.compute(enviedClass)));

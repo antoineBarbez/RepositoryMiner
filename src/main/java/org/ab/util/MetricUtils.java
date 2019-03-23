@@ -22,7 +22,7 @@ public class MetricUtils {
 		}
 		String[] splittedDeclaringClassName = Arrays.copyOf(splittedComponentName, splittedComponentName.length-1);
 		String classIdentifier = splittedDeclaringClassName[splittedDeclaringClassName.length-1];
-		if (!Character.isUpperCase(classIdentifier.charAt(0))) {
+		if (!classIdentifier.isEmpty() && !Character.isUpperCase(classIdentifier.charAt(0))) {
 			return null;
 		}
 		return String.join(".", splittedDeclaringClassName);
