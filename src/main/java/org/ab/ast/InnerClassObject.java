@@ -18,7 +18,11 @@ public class InnerClassObject extends ClassObject {
 	
 	@Override
 	public boolean isRelatedTo(ClassObject aClass) {
-		if (super.isRelatedTo(aClass) || declaringClass.isRelatedTo(aClass)) {
+		if (super.isRelatedTo(aClass)) {
+			return true;
+		}
+		
+		if (aClass.inheritFrom(declaringClass) || declaringClass.inheritFrom(aClass)) {
 			return true;
 		}
 		
@@ -27,10 +31,5 @@ public class InnerClassObject extends ClassObject {
 	
 	public void setDeclaringClass(ClassObject declaringClass) {
 		this.declaringClass = declaringClass;
-	}
-	
-	@Override
-	public FileObject getFile() {
-		return declaringClass.getFile();
 	}
 }

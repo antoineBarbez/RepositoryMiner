@@ -1,11 +1,10 @@
-package org.ab.mfb;
+package org.ab.mfb.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import org.ab.ast.ClassObject;
@@ -19,16 +18,18 @@ import org.ab.metrics.NAA;
 import org.ab.metrics.NAD;
 import org.ab.metrics.NIM;
 import org.ab.metrics.NMD;
+import org.ab.mfb.BinaryMetricFileBuilder;
+import org.ab.mfb.BinaryMetricFileBuilder.Tuple;
 
-public class FeatureEnvyMetricFileBuilder extends MetricFileBuilder {
+public class FeatureEnvyMetricFileBuilder extends BinaryMetricFileBuilder {
 
 	@Override
-	public List<String> getEntities() {
+	public List<Tuple<String, String>> getComponents() {
 		SystemObject s = SystemObject.getInstance();
 		
-		List<String> entities = new ArrayList<String>();
+		List<Tuple<String, String>> tuples = new ArrayList<Tuple<String, String>>();
 		for (MethodObject m: s.getMethods()) {
-			if (!m.getModifiers().contains("static") && !m.isAccessor() && !m.isConstructor()) {
+			if (!m.isAccessor() && !m.isConstructor()) {
 				Set<ClassObject> accessedClasses = new HashSet<ClassObject>();
 				for (String accessedFieldName: m.getAccessedFields()) {
 					FieldObject accessedField = s.getFieldByName(accessedFieldName);
@@ -46,16 +47,13 @@ public class FeatureEnvyMetricFileBuilder extends MetricFileBuilder {
 				
 				if (accessedClasses.size() != 0) {
 					for (ClassObject accessedClass: accessedClasses) {
-						StringBuffer lineBuffer = new StringBuffer();
-						lineBuffer.append(m.getName());
-						lineBuffer.append(";");
-						lineBuffer.append(accessedClass.getName());
-						entities.add(lineBuffer.toString());
+						Tuple<String, String> tuple = new Tuple<String, String>(m.getName(), accessedClass.getName());
+						tuples.add(tuple);
 					}	
 				}
 			}
 		}
-		return entities;
+		return tuples;
 	}
 
 	@Override
@@ -64,12 +62,9 @@ public class FeatureEnvyMetricFileBuilder extends MetricFileBuilder {
 	}
 
 	@Override
-	public List<String> getMetricValues(String entity) {
-		String methodName = entity.split(";")[0];
-		String className = entity.split(";")[1];
-		
-		MethodObject method = SystemObject.getInstance().getMethodByName(methodName);
-		ClassObject enviedClass = SystemObject.getInstance().getClassByName(className);
+	public List<String> getMetricValues(Tuple<String, String> tuple) {
+		MethodObject method = SystemObject.getInstance().getMethodByName(tuple.x);
+		ClassObject enviedClass = SystemObject.getInstance().getClassByName(tuple.y);
 		
 		if (method == null || enviedClass == null) {
 			return Arrays.asList("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
@@ -92,31 +87,5 @@ public class FeatureEnvyMetricFileBuilder extends MetricFileBuilder {
 		metricValues.add(String.valueOf(NMD.compute(enviedClass)));
 		metricValues.add(String.valueOf(NAD.compute(enviedClass)));
 		return metricValues;
-	}
-	
-	@Override
-	public void handleRenamedComponents(Map<String, String> renamedClasses, Map<String, String> renamedMethods) {
-		for (Map.Entry<String, String> entry_e : currentNames.entrySet()) {
-			String initialName = entry_e.getKey();
-			String currentName = entry_e.getValue();
-			
-			for (Map.Entry<String, String> entry_c : renamedClasses.entrySet()) {
-				String oldClassName = entry_c.getKey();
-				String newClassName = entry_c.getValue();
-				if (initialName.endsWith(";" + oldClassName) || currentName.endsWith(";" + oldClassName)) {
-					String currentMethodName = currentName.split(";")[0];
-					currentNames.put(initialName, currentMethodName + ";" + newClassName);
-				}
-			}
-			
-			for (Map.Entry<String, String> entry_m : renamedMethods.entrySet()) {
-				String oldMethodName = entry_m.getKey();
-				String newMethodName = entry_m.getValue();
-				if (initialName.startsWith(oldMethodName + ";") || currentName.startsWith(oldMethodName + ";")) {
-					String currentClassName = currentName.split(";")[1];
-					currentNames.put(initialName, newMethodName + ";" + currentClassName);
-				}
-			}
-		}
 	}
 }

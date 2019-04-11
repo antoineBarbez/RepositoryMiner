@@ -11,7 +11,6 @@ import org.ab.ast.ClassObject;
 import org.ab.ast.FileObject;
 import org.ab.ast.InnerClassObject;
 import org.ab.ast.MethodObject;
-import org.ab.ast.TopLevelClassObject;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Statement;
@@ -25,18 +24,15 @@ public class RenamedComponentsDetector {
 	
 	private ASTMatcher matcher;
 	
-	private Map<String, String> renamedClasses;
-	private Map<String, String> renamedMethods;
+	private Map<String, String> renamedComponents;
 	
 	public RenamedComponentsDetector() {
 		matcher = new ASTMatcher();
-		renamedClasses = new HashMap<String, String>();
-		renamedMethods = new HashMap<String, String>();
+		renamedComponents = new HashMap<String, String>();
 	}
 	
 	public void clear() {
-		renamedClasses.clear();
-		renamedMethods.clear();
+		renamedComponents.clear();
 	}
 	
 	private boolean compare(ClassObject c1, ClassObject c2) {
@@ -222,14 +218,14 @@ public class RenamedComponentsDetector {
 	
 	public void detectRenamedComponents(FileObject initialFile, FileObject finalFile) {
 		// Process top-level classes
-		Set<TopLevelClassObject> initialTopLevelClasses = new HashSet<TopLevelClassObject>(initialFile.getTopLevelClasses());
-		Set<TopLevelClassObject> finalTopLevelClasses = new HashSet<TopLevelClassObject>(finalFile.getTopLevelClasses());
+		Set<ClassObject> initialTopLevelClasses = new HashSet<ClassObject>(initialFile.getTopLevelClasses());
+		Set<ClassObject> finalTopLevelClasses = new HashSet<ClassObject>(finalFile.getTopLevelClasses());
 		
-		for (TopLevelClassObject ic : initialFile.getTopLevelClasses()) {
-			TopLevelClassObject homonymClass;
-			if ((homonymClass = (TopLevelClassObject)findClassWithSameIdentifier(ic, finalTopLevelClasses)) != null) {
+		for (ClassObject ic : initialFile.getTopLevelClasses()) {
+			ClassObject homonymClass;
+			if ((homonymClass = (ClassObject)findClassWithSameIdentifier(ic, finalTopLevelClasses)) != null) {
 				if (!ic.getName().equals(homonymClass.getName())) {
-					renamedClasses.put(ic.getName(), homonymClass.getName());
+					renamedComponents.put(ic.getName(), homonymClass.getName());
 				}
 				detectRenamedComponents(ic, homonymClass);
 				initialTopLevelClasses.remove(ic);
@@ -238,10 +234,10 @@ public class RenamedComponentsDetector {
 		}
 		
 		// Check for similarity between remaining classes
-		for (TopLevelClassObject ic : initialTopLevelClasses) {
-			TopLevelClassObject similarClass;
-			if ((similarClass = (TopLevelClassObject)findSimilarClass(ic, finalTopLevelClasses)) != null) {
-				renamedClasses.put(ic.getName(), similarClass.getName());
+		for (ClassObject ic : initialTopLevelClasses) {
+			ClassObject similarClass;
+			if ((similarClass = (ClassObject)findSimilarClass(ic, finalTopLevelClasses)) != null) {
+				renamedComponents.put(ic.getName(), similarClass.getName());
 				detectRenamedComponents(ic, similarClass);
 				finalTopLevelClasses.remove(similarClass);
 			}
@@ -257,7 +253,7 @@ public class RenamedComponentsDetector {
 			InnerClassObject homonymClass;
 			if ((homonymClass = (InnerClassObject)findClassWithSameIdentifier(ic, finalInnerClasses)) != null) {
 				if (!ic.getName().equals(homonymClass.getName())) {
-					renamedClasses.put(ic.getName(), homonymClass.getName());
+					renamedComponents.put(ic.getName(), homonymClass.getName());
 				}
 				detectRenamedComponents(ic, homonymClass);
 				initialInnerClasses.remove(ic);
@@ -269,7 +265,7 @@ public class RenamedComponentsDetector {
 		for (InnerClassObject ic: initialInnerClasses) {
 			InnerClassObject similarClass;
 			if ((similarClass = (InnerClassObject)findSimilarClass(ic, finalInnerClasses)) != null) {
-				renamedClasses.put(ic.getName(), similarClass.getName());
+				renamedComponents.put(ic.getName(), similarClass.getName());
 				detectRenamedComponents(ic, similarClass);
 				finalInnerClasses.remove(similarClass);
 			}
@@ -283,7 +279,7 @@ public class RenamedComponentsDetector {
 			MethodObject homonymMethod;
 			if ((homonymMethod = findMethodWithSameSignature(im, finalMethods)) !=null) {
 				if (!im.getName().equals(homonymMethod.getName())) {
-					renamedMethods.put(im.getName(), homonymMethod.getName());
+					renamedComponents.put(im.getName(), homonymMethod.getName());
 				}
 				initialMethods.remove(im);
 				finalMethods.remove(homonymMethod);
@@ -294,7 +290,7 @@ public class RenamedComponentsDetector {
 		for (MethodObject im : initialMethods) {
 			MethodObject similarMethod;
 			if ((similarMethod = findSimilarMethod(im, finalMethods)) != null) {
-				renamedMethods.put(im.getName(), similarMethod.getName());
+				renamedComponents.put(im.getName(), similarMethod.getName());
 				finalMethods.remove(similarMethod);
 			}
 		}	
@@ -347,11 +343,7 @@ public class RenamedComponentsDetector {
 		return null;
 	}
 	
-	public Map<String, String> getRenamedClasses() {
-		return renamedClasses;
-	}
-	
-	public Map<String, String> getRenamedMethods() {
-		return renamedMethods;
+	public Map<String, String> getRenamedComponents() {
+		return renamedComponents;
 	}
 }

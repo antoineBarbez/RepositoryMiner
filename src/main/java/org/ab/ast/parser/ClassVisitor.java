@@ -9,7 +9,6 @@ import org.ab.ast.FieldObject;
 import org.ab.ast.ClassObject;
 import org.ab.ast.InnerClassObject;
 import org.ab.ast.MethodObject;
-import org.ab.ast.TopLevelClassObject;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -20,19 +19,10 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class ClassVisitor extends ASTVisitor {
-	
 	private ClassObject classObject;
 	
-	public ClassVisitor(String className, boolean isInnerClass) {
-		if (isInnerClass) {
-			classObject = new InnerClassObject(className);
-		}else {
-			classObject = new TopLevelClassObject(className);
-		}
-	}
-	
-	public ClassObject getClassObject() {
-		return this.classObject;
+	public ClassVisitor(ClassObject classObject) {
+		this.classObject = classObject;
 	}
 	
 	@Override
@@ -47,11 +37,7 @@ public class ClassVisitor extends ASTVisitor {
 			return true;
 		}
 		
-		// Visit the class.
-		ClassVisitor visitor = new ClassVisitor(node.getName().getIdentifier(), true);
-		node.accept(visitor);
-		
-		InnerClassObject c = (InnerClassObject)visitor.getClassObject();
+		InnerClassObject c = new InnerClassObject(node.getName().getIdentifier());
 		
 		if (node.getSuperclassType() != null) {
 			ITypeBinding bind = node.getSuperclassType().resolveBinding();
@@ -66,6 +52,12 @@ public class ClassVisitor extends ASTVisitor {
 		c.setInterface(node.isInterface());
 		c.setModifiers(modifiers);
 		c.setDeclaringClass(classObject);
+		c.setFile(classObject.getFile());
+		
+		// Visit the class.
+		ClassVisitor visitor = new ClassVisitor(c);
+		node.accept(visitor);
+		
 		classObject.addInnerClass(c);
 		
 		return false;
@@ -92,12 +84,7 @@ public class ClassVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		// Visit the body of the method.
-		MethodVisitor visitor = new MethodVisitor(node.getName().getIdentifier());
-		if (node.getBody() != null) {
-			node.getBody().accept(visitor);
-		}
-		
-		MethodObject method = visitor.getMethodObject();
+		MethodObject m = new MethodObject(node.getName().getIdentifier());
 		
 		Set<String> modifiers = new HashSet<String>();
 		for (Object modifier: node.modifiers()) {
@@ -110,16 +97,21 @@ public class ClassVisitor extends ASTVisitor {
 		}
 		
 		if (node.getReturnType2() != null) {
-			method.setReturnType(node.getReturnType2().toString());
+			m.setReturnType(node.getReturnType2().toString());
 		}
 		
-		method.setBody(node.getBody());
-		method.setConstructor(node.isConstructor());
-		method.setModifiers(modifiers);
-		method.setParameters(params);
-		method.setDeclaringClass(classObject);
-		classObject.addMethod(method);
+		m.setBody(node.getBody());
+		m.setConstructor(node.isConstructor());
+		m.setModifiers(modifiers);
+		m.setParameters(params);
+		m.setDeclaringClass(classObject);
 		
+		MethodVisitor visitor = new MethodVisitor(m);
+		if (node.getBody() != null) {
+			node.getBody().accept(visitor);
+		}
+		
+		classObject.addMethod(m);
 		return true;
 	}
 }

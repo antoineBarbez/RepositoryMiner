@@ -29,13 +29,13 @@ public class SystemObject {
 	public void addFile(FileObject file) {
 		files.add(file);
 		fileMap.put(file.getPath(), file);
-		for (TopLevelClassObject c: file.getTopLevelClasses()) {
+		for (ClassObject c: file.getTopLevelClasses()) {
 			fillMapsRecursively(c);
 		}
 	}
 	
 	public void removeFile(FileObject file) {
-		for (TopLevelClassObject c: file.getTopLevelClasses()) {
+		for (ClassObject c: file.getTopLevelClasses()) {
 			emptyMapsRecursively(c);
 		}
 		fileMap.remove(file.getPath());

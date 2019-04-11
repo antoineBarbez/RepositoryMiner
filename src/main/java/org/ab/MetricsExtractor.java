@@ -8,7 +8,7 @@ import java.util.Iterator;
 import org.ab.ast.FileObject;
 import org.ab.ast.SystemObject;
 import org.ab.ast.parser.Parser;
-import org.ab.mfb.MetricFileBuilder;
+import org.ab.mfb.IMetricFileBuilder;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -23,12 +23,12 @@ public class MetricsExtractor {
 	private final int MAX_HISTORY_LENGTH;
 	
 	private Git git;
-	private MetricFileBuilder mfb;
+	private IMetricFileBuilder mfb;
 	private Parser parser;
 	private String projectDir;
 	private RenamedComponentsDetector rcd;
 	
-	public MetricsExtractor(Git git, MetricFileBuilder mfb, int max) throws IOException {
+	public MetricsExtractor(Git git, IMetricFileBuilder mfb, int max) throws IOException {
 		this.MAX_HISTORY_LENGTH = max;
 		
 		this.git = git;
@@ -36,13 +36,6 @@ public class MetricsExtractor {
 		this.projectDir = git.getRepository().getDirectory().getParentFile().getAbsolutePath();
 		this.parser = new Parser(this.projectDir);
 		this.rcd = new RenamedComponentsDetector();
-	}
-	
-	public void extractAtCommit(String sha, String[] dirs, String outputDir) throws Exception {
-		populateSystem(sha, dirs);
-		
-		// Extract metrics
-		mfb.buildMetricFile(outputDir + "metrics_gc.csv");
 	}
 	
 	public void extractFromCommit(String sha, String[] dirs, String outputDir) throws Exception {
@@ -61,10 +54,11 @@ public class MetricsExtractor {
 			
 			if (changed) {
 				// Extract metrics
-				mfb.handleRenamedComponents(rcd.getRenamedClasses(), rcd.getRenamedMethods());
+				mfb.handleRenamedComponents(rcd.getRenamedComponents());
 				
 				String metricFilePath = outputDir + String.format("/commit_%d.csv", count); 
 				count = mfb.buildMetricFile(metricFilePath) == true ? count+1 : count;
+				
 				changed = false;
 				rcd.clear();
 			}
@@ -80,8 +74,9 @@ public class MetricsExtractor {
 		parser.updateSourcepathEntries();
 	}
 	
-	private void populateSystem(String sha, String[] dirs) throws Exception {
-		System.out.println("Building system model ...");
+	public void populateSystem(String sha, String[] dirs) throws Exception {
+		String systemName = git.getRepository().getDirectory().getParentFile().getName();
+		System.out.println("Building system model for " + systemName + " ...");
 		// Checkout
         checkout(sha);
         

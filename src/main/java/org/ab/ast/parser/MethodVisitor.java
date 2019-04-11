@@ -15,8 +15,8 @@ import org.eclipse.jdt.core.dom.SimpleName;
 public class MethodVisitor extends ASTVisitor {
 	private MethodObject methodObject;
 	
-	public MethodVisitor(String name) {
-		this.methodObject = new MethodObject(name);
+	public MethodVisitor(MethodObject methodObject) {
+		this.methodObject = methodObject;
 	}
 	
 	public MethodObject getMethodObject() {

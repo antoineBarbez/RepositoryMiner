@@ -2,6 +2,7 @@ package org.ab.ast.parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -26,7 +27,13 @@ public class Parser {
 	
 	public FileObject parseFile(File file) throws IOException {
 		String relativePath = file.getAbsolutePath().substring(projectFolder.length() + 1);
-				
+		if (relativePath.equals("src/java/com/android/internal/telephony/DataConnection.java")) {
+			try (PrintWriter out = new PrintWriter("/Users/antoinebarbez/Desktop/test.java")) {
+				out.print(FileUtils.readFileToString(file, "UTF-8"));
+			}
+		}
+		
+		
 		ASTParser parser = ASTParser.newParser(AST.JLS10);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setResolveBindings(true);

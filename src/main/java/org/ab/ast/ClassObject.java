@@ -3,9 +3,10 @@ package org.ab.ast;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class ClassObject extends CodeComponent {
+public class ClassObject extends CodeComponent {
 	private boolean _interface;
 	private String superClassName = null;
+	private FileObject file;
 	private Set<FieldObject> fields = new HashSet<FieldObject>();
 	private Set<InnerClassObject> innerClasses = new HashSet<InnerClassObject>();
 	private Set<MethodObject> methods = new HashSet<MethodObject>();
@@ -30,7 +31,9 @@ public abstract class ClassObject extends CodeComponent {
 		return fields;
 	}
 	
-	public abstract FileObject getFile();
+	public FileObject getFile() {
+		return file;
+	}
 	
 	public Set<InnerClassObject> getInnerClasses() {
 		return innerClasses;
@@ -95,7 +98,13 @@ public abstract class ClassObject extends CodeComponent {
 	}
 	
 	public boolean isRelatedTo(ClassObject aClass) {
-		if (aClass.getFile().getPath().equals(this.getFile().getPath())) {
+		// Check if it is the same class
+		if (aClass.getName().equals(getName())) {
+			return true;
+		}
+		
+		// Check if it is an inner class of the current class
+		if (aClass.getName().startsWith(getName() + ".")) {
 			return true;
 		}
 		
@@ -105,6 +114,10 @@ public abstract class ClassObject extends CodeComponent {
 		}
 		
 		return false;
+	}
+	
+	public void setFile(FileObject file) {
+		this.file = file;
 	}
 	
 	public void setInterface(boolean _interface) {
