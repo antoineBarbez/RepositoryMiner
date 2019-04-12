@@ -41,8 +41,8 @@ public class RepositoryMiner {
 		}
 		
 		try (Git git = openRepository(projectDir)) {
-			MetricsExtractor metricsExtractor = new MetricsExtractor(git, mfb, 1000);
-			metricsExtractor.extractFromCommit(sha, dirsToAnalyze, normalizedOutputDir);
+			MetricsExtractor metricsExtractor = new MetricsExtractor(git, mfb);
+			metricsExtractor.extractFromCommit(sha, dirsToAnalyze, normalizedOutputDir, 1000);
 		}
 	}
 	

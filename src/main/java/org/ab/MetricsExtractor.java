@@ -20,17 +20,13 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 public class MetricsExtractor {
-	private final int MAX_HISTORY_LENGTH;
-	
 	private Git git;
 	private IMetricFileBuilder mfb;
 	private Parser parser;
 	private String projectDir;
 	private RenamedComponentsDetector rcd;
 	
-	public MetricsExtractor(Git git, IMetricFileBuilder mfb, int max) throws IOException {
-		this.MAX_HISTORY_LENGTH = max;
-		
+	public MetricsExtractor(Git git, IMetricFileBuilder mfb) throws IOException {
 		this.git = git;
 		this.mfb = mfb;
 		this.projectDir = git.getRepository().getDirectory().getParentFile().getAbsolutePath();
@@ -38,19 +34,38 @@ public class MetricsExtractor {
 		this.rcd = new RenamedComponentsDetector();
 	}
 	
-	public void extractFromCommit(String sha, String[] dirs, String outputDir) throws Exception {
+	public void extractAtCommit(String sha, String[] dirs, String outputDir) throws Exception {
+		extractFromCommit(sha, dirs, outputDir, 1);
+	}
+	
+	public void extractBetweenCommits(String sha1, String sha2, String[] dirs, String outputDir) throws Exception {
+		populateSystem(sha1, dirs);
+		
+		// Retrieve commits in the range [sha1, sha2]
+		ObjectId from = git.getRepository().resolve(sha1);
+		ObjectId to = git.getRepository().resolve(sha2);
+		Iterator<RevCommit> iteratorOnCommits = git.log().addRange(from, to).call().iterator();
+		
+		extractMetricsHistory(iteratorOnCommits, outputDir, 100000);
+	}
+	
+	public void extractFromCommit(String sha, String[] dirs, String outputDir, int maxLength) throws Exception {
 		populateSystem(sha, dirs);
         
         // Retrieve all prior commits
         ObjectId head = git.getRepository().resolve(Constants.HEAD);
         Iterator<RevCommit> iteratorOnCommits = git.log().add(head).call().iterator(); 
         
+        extractMetricsHistory(iteratorOnCommits, outputDir, maxLength);	
+	}
+	
+	private void extractMetricsHistory(Iterator<RevCommit> commits, String outputDir, int maxLength) throws Exception { 
         int count = 0;
         boolean changed = true;
-        RevCommit currentCommit = iteratorOnCommits.next();
+        RevCommit currentCommit = commits.next();
         System.out.println("Start mining history ...");
-        while(count < MAX_HISTORY_LENGTH && iteratorOnCommits.hasNext()) {
-			RevCommit previousCommit = iteratorOnCommits.next();
+        while(count < maxLength && commits.hasNext()) {
+			RevCommit previousCommit = commits.next();
 			
 			if (changed) {
 				// Extract metrics
@@ -66,7 +81,7 @@ public class MetricsExtractor {
 			// Update the system if necessary
 			changed = updateSystem(previousCommit, currentCommit);
 			currentCommit = previousCommit;
-		}	
+		}
 	}
 	
 	private void checkout(String sha) throws Exception {
@@ -74,7 +89,7 @@ public class MetricsExtractor {
 		parser.updateSourcepathEntries();
 	}
 	
-	public void populateSystem(String sha, String[] dirs) throws Exception {
+	private void populateSystem(String sha, String[] dirs) throws Exception {
 		String systemName = git.getRepository().getDirectory().getParentFile().getName();
 		System.out.println("Building system model for " + systemName + " ...");
 		// Checkout
