@@ -1,7 +1,7 @@
 # RepositoryMiner
 
 RepositoryMiner is a project/API that allows to extract the history of source code metrics.
-The RepositoryMiner walks through the history of revisions (i.e., commits) of a project and allows compute the values of several software metrics at each revision.
+The RepositoryMiner walks through the history of revisions (i.e., commits) of a project and allows compute the values of several software metrics at each revision. Note that the RepositoryMiner can also be used to simply compute the values the metrics at a specific revision.
 
 The RepositoryMiner produces a set of *.csv* files. Each file contains the values of the chosen metrics (e.g., Lines Of Code) computed for a set of predefined code components (e.g. classes or methods), **at a specific revision of the system**.
 
@@ -13,7 +13,7 @@ However, if you want to make your own use of the RepositoryMiner, you can find b
 * LCOM5 (Lack of COhesion in Methods)
 * WMC (Weighted Method Count)
 
-In this example, we extract the history of these three metrics for each class of the system under investigation. Also, we fix a limit of 100 *.csv* files to be produced.
+In this example, we extract the history of these three metrics for each class of the system under investigation.
 ```Java
 String repoPath = "~/my-repository";
 String commitId = "c241cad754ecf27c96b09f1e585b8be341dfcb71";
@@ -57,8 +57,14 @@ MetricsExtractor metricsExtractor = new MetricsExtractor(git, new UnaryMetricFil
   }
 });
 
-// Here we fix the limit of revisions to be considered to 100
+// To limit the number of revisions to be considered (100 here)
 metricsExtractor.extractFromCommit(commitId, new String[]{""}, outputDir, 100);
+
+// To extract the history between two commits
+metricsExtractor.extractBetweenCommits(commitId1, commitId2, new String[]{""}, outputDir);
+
+// To simply compute the metrics at a specific commit
+metricsExtractor.extractAtCommit(commitId, new String[]{""}, outputDir);
 ```
 
 ### Good to know
